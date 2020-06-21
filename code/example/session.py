@@ -52,8 +52,8 @@ data_pre=data_prepare()
 np.random.seed(2020)
 tf.random.set_seed(2020)
 
-trainDf=pd.read_csv(origin_data_folder+'session_train.csv')
-testDf=pd.read_csv(origin_data_folder+'session_test.csv')
+trainDf=pd.read_csv(origin_data_folder+'session_train.csv',nrows=3)
+testDf=pd.read_csv(origin_data_folder+'session_test.csv',nrows=1)
 
 session_maxLen=10
 session_maxNum=20

@@ -189,7 +189,7 @@ def AutoInt(spareInfo:list=None,denseInfo:list=None,attention_dim=8,attention_he
     [dense_inputs, spare_inputs, seq_inputs] = prepare_tool.df_prepare(
         spareInfo=spareInfo, denseInfo=denseInfo)
     cross_embed = StackLayer(use_flat=False,axis=1)(SparseEmbed(spareInfo, use_flatten=False)(spare_inputs))
-    atten_layer=MultHeadAttentionLayer(attention_dim=attention_dim,attention_head_dim=attention_head_dim,use_ln=True)
+    atten_layer=MultHeadAttentionLayer(attention_dim=attention_dim,attention_head_dim=attention_head_dim,use_ln=True,atten_mask_mod=1)
     atten_vec=DnnLayer(res_unit=1,other_dense=[atten_layer])(cross_embed)
     final_input=StackLayer(use_flat=True,axis=-1)([tf.squeeze(i,0) for i in tf.split(atten_vec,[1]*atten_vec.shape[0])])
     output=MergeScoreLayer(use_merge=False)(final_input)

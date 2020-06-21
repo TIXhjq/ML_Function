@@ -52,8 +52,8 @@ prepare_tool=data_prepare()
 np.random.seed(2020)
 tf.random.set_seed(2020)
 
-train_df=pd.read_csv(origin_data_folder+'unseq_train.csv').rename(columns={'target':'label'})
-test_df=pd.read_csv(origin_data_folder+'unseq_test.csv').rename(columns={'target':'label'})
+train_df=pd.read_csv(origin_data_folder+'unseq_train.csv').rename(columns={'target':'label'},nrows=3)
+test_df=pd.read_csv(origin_data_folder+'unseq_test.csv').rename(columns={'target':'label'},nrows=1)
 
 sparse_fea=[str(i) for i in range(14,40)]
 dense_fea=[str(i) for i in range(1,14)]

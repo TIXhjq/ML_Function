@@ -322,9 +322,7 @@ class ProductAttentionLayer(tf.keras.layers.Layer):
                 atten_score=tf.matmul(atten_score,mask)
             if self.mask_mod==2:
                 mask = tf.cast(mask,'float')
-                print(mask)
                 mask = mask*(-100000)
-                print(mask)
                 atten_score=tf.add(atten_score,mask)
 
         atten_score=self.softmax(atten_score)
