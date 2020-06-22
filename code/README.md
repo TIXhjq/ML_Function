@@ -1,5 +1,5 @@
 Code Collection  
->1.nn  
+>1.NN  
 >>1)[CTR Model(update...)(可食用代码)](https://github.com/TIXhjq/CTR_Function/tree/master/code/model/ctr_model)  
 >>2)GNN(不可食用)  
   
