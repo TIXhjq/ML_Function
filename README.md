@@ -1,8 +1,8 @@
 # CTR_Function
 
-  code=[nn,feature_eng]  
-  paper=[nn(目前只有CTR部分,剩下的下次一定^_^)]  
-  data=[nn test sample data]  
+  [code](https://github.com/TIXhjq/CTR_Function/tree/master/code)=[nn,feature_eng]  
+  [paper](https://github.com/TIXhjq/CTR_Function/tree/master/paper)=[nn(目前只有CTR部分,剩下的下次一定^_^)]  
+  [data](https://github.com/TIXhjq/CTR_Function/tree/master/data)=[nn test sample data]  
     
   p.s 
       nn=[CTR,GNN]
