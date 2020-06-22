@@ -19,11 +19,11 @@ CTR MODEL ACHIEVE:
     4.[[SeqFM]Sequence-Aware Factorization Machines(2019).pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BSeqFM%5DSequence-Aware%20Factorization%20Machines(2019).pdf)  
     ...Later Building...  
     
-  [3]目前计划:
-    1.[[MIMN]Practice on Long Sequential User Behavior Modeling for Click-Through Rate Prediction[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BMIMN%5DPractice%20on%20Long%20Sequential%20User%20Behavior%20Modeling%20for%20Click-Through%20Rate%20Prediction%5B2019%5D.pdf)
-    <building>2.[[DSTN]Deep Spatio-Temporal Neural Networks for Click-Through Rate Prediction[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BDSTN%5DDeep%20Spatio-Temporal%20Neural%20Networks%20for%20Click-Through%20Rate%20Prediction%5B2019%5D.pdf)
-    <building>3.[[DTSF]Deep Time-Stream Framework for Click-Through Rate Prediction by Tracking Interest Evolution[2020].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/Next%20Read/%5BDTSF%5DDeep%20Time-Stream%20Framework%20for%20Click-Through%20Rate%20Prediction%20by%20Tracking%20Interest%20Evolution%5B2020%5D.pdf)
-    ......
+  [3]目前计划:  
+    1.[[MIMN]Practice on Long Sequential User Behavior Modeling for Click-Through Rate Prediction[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BMIMN%5DPractice%20on%20Long%20Sequential%20User%20Behavior%20Modeling%20for%20Click-Through%20Rate%20Prediction%5B2019%5D.pdf)  
+    <building>2.[[DSTN]Deep Spatio-Temporal Neural Networks for Click-Through Rate Prediction[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BDSTN%5DDeep%20Spatio-Temporal%20Neural%20Networks%20for%20Click-Through%20Rate%20Prediction%5B2019%5D.pdf)  
+    <building>3.[[DTSF]Deep Time-Stream Framework for Click-Through Rate Prediction by Tracking Interest Evolution[2020].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/Next%20Read/%5BDTSF%5DDeep%20Time-Stream%20Framework%20for%20Click-Through%20Rate%20Prediction%20by%20Tracking%20Interest%20Evolution%5B2020%5D.pdf)  
+    ......  
 
     p.s  
     1.DIEN,paper中的控制更新门并没有实际实现,实际上因为keras里面的
