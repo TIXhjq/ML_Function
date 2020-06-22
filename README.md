@@ -1,7 +1,13 @@
 # CTR_Function
 
   code=[nn,feature_eng]  
-  paper=[nn]  
-  data=[nn test sample data]
-  
-目前已经完成了一些模型和基本方法修建,nn部分还会不断更新,不过有一些以前的代码,一直懒得重构,未来可能会打包  
+  paper=[nn(目前只有CTR部分,剩下的下次一定^_^)]  
+  data=[nn test sample data]  
+    
+  p.s 
+      nn=[CTR,GNN]
+      feature_eng=[cross_fea,batch_stat,gen_graph,judge_distribute...]  
+      每个文件夹内目录页有详细介绍...
+      
+  不过由于feature_eng基本都是以前收录的,有很多需要重构,还有GNN部分也是,目前可食用只有CTR部分,
+  以后会把他们拼在一起,做成一个快速生成baseline的工具库.  
