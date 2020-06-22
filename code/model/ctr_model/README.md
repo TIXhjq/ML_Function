@@ -25,9 +25,9 @@ CTR MODEL ACHIEVE:
     <building>3.[DTSF]Deep Time-Stream Framework for Click-Through Rate Prediction by Tracking Interest Evolution[2020].pdf
 
     p.s  
-        1.DIEN,paper中的控制更新门并没有实际实现,实际上因为keras里面的
-        我只弄了standardLstm,但CudnnLstm改动起来有点麻烦，实际上这里是是直接使
-        用weight*hidden_state模型  
+    1.DIEN,paper中的控制更新门并没有实际实现,实际上因为keras里面的
+    我只弄了standardLstm,但CudnnLstm改动起来有点麻烦，实际上这里是是直接使
+    用weight*hidden_state模型  
   
 部分模型小结...  
     https://zhuanlan.zhihu.com/c_1145034612807028736  
