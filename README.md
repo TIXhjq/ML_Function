@@ -3,7 +3,7 @@
 ![image](https://img.shields.io/badge/author-TIXhjq-orange)
 ![image](https://img.shields.io/badge/License-Apache_2.0-blue)
 ![image](https://img.shields.io/badge/License-tensorflow2.1-darkgreen)
-![image](https://img.shields.io/badge/python-python3.7-darkgreen)
+![image](https://img.shields.io/badge/python-python3.7-purple)
 
 
   [code](https://github.com/TIXhjq/CTR_Function/tree/master/code)=[nn,feature_eng]  
