@@ -1,5 +1,5 @@
 #CTR MODEL ACHIEVE:  
->[1]Interactive Model  
+##>[1]Interactive Model  
 >>1.[[FM] Fast Context-aware Recommendations with Factorization Machines (UKON 2011).pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/interactive/%5BFM%5D%20Fast%20Context-aware%20Recommendations%20with%20Factorization%20Machines%20(UKON%202011).pdf)  
 >>2.[[PNN] Product-based Neural Networks for User Response Prediction (SJTU 2016).pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/interactive/%5BPNN%5D%20Product-based%20Neural%20Networks%20for%20User%20Response%20Prediction%20(SJTU%202016).pdf)  
 >>3.[[Deep Crossing] Deep Crossing - Web-Scale Modeling without Manually Crafted Combinatorial Features (Microsoft 2016).pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/interactive/%5BDeep%20Crossing%5D%20Deep%20Crossing%20-%20Web-Scale%20Modeling%20without%20Manually%20Crafted%20Combinatorial%20Features%20(Microsoft%202016).pdf)  
@@ -12,18 +12,18 @@
 >>10.[[AutoInt] AutoInt Automatic Feature Interaction Learning via Self-Attentive Neural Networks(CIKM 2019).pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/interactive/%5BAutoInt%5D%20AutoInt%20Automatic%20Feature%20Interaction%20Learning%20via%20Self-Attentive%20Neural%20Networks(CIKM%202019).pdf)  
 >>...Later Building...  
       
-  >[2]Behavior Model  
-    >>1.[[DIN] Deep Interest Network for Click-Through Rate Prediction (Alibaba 2018).pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BDIN%5D%20Deep%20Interest%20Network%20for%20Click-Through%20Rate%20Prediction%20(Alibaba%202018).pdf)  
-    >>2.[[DIEN] Deep Interest Evolution Network for Click-Through Rate Prediction (Alibaba 2019).pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BDIEN%5D%20Deep%20Interest%20Evolution%20Network%20for%20Click-Through%20Rate%20Prediction%20(Alibaba%202019).pdf)  
-    >>3.[[DSIN]Deep Session Interest Network for Click-Through Rate Predicti(Alibaba 2019).pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BDSIN%5DDeep%20Session%20Interest%20Network%20for%20Click-Through%20Rate%20Predicti%5B2019%5D.pdf)  
-    >>4.[[SeqFM]Sequence-Aware Factorization Machines(2019).pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BSeqFM%5DSequence-Aware%20Factorization%20Machines(2019).pdf)  
-    >>...Later Building...  
+>[2]Behavior Model  
+>>1.[[DIN] Deep Interest Network for Click-Through Rate Prediction (Alibaba 2018).pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BDIN%5D%20Deep%20Interest%20Network%20for%20Click-Through%20Rate%20Prediction%20(Alibaba%202018).pdf)  
+>>2.[[DIEN] Deep Interest Evolution Network for Click-Through Rate Prediction (Alibaba 2019).pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BDIEN%5D%20Deep%20Interest%20Evolution%20Network%20for%20Click-Through%20Rate%20Prediction%20(Alibaba%202019).pdf)  
+>>3.[[DSIN]Deep Session Interest Network for Click-Through Rate Predicti(Alibaba 2019).pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BDSIN%5DDeep%20Session%20Interest%20Network%20for%20Click-Through%20Rate%20Predicti%5B2019%5D.pdf)  
+>>4.[[SeqFM]Sequence-Aware Factorization Machines(2019).pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BSeqFM%5DSequence-Aware%20Factorization%20Machines(2019).pdf)  
+>>...Later Building...  
     
-  >[3]目前计划:  
-    >>1.[[MIMN]Practice on Long Sequential User Behavior Modeling for Click-Through Rate Prediction[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BMIMN%5DPractice%20on%20Long%20Sequential%20User%20Behavior%20Modeling%20for%20Click-Through%20Rate%20Prediction%5B2019%5D.pdf)  
-    >><building>2.[[DSTN]Deep Spatio-Temporal Neural Networks for Click-Through Rate Prediction[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BDSTN%5DDeep%20Spatio-Temporal%20Neural%20Networks%20for%20Click-Through%20Rate%20Prediction%5B2019%5D.pdf)  
-    >><building>3.[[DTSF]Deep Time-Stream Framework for Click-Through Rate Prediction by Tracking Interest Evolution[2020].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/Next%20Read/%5BDTSF%5DDeep%20Time-Stream%20Framework%20for%20Click-Through%20Rate%20Prediction%20by%20Tracking%20Interest%20Evolution%5B2020%5D.pdf)  
-    >>......  
+>[3]目前计划:  
+>>1.[[MIMN]Practice on Long Sequential User Behavior Modeling for Click-Through Rate Prediction[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BMIMN%5DPractice%20on%20Long%20Sequential%20User%20Behavior%20Modeling%20for%20Click-Through%20Rate%20Prediction%5B2019%5D.pdf)  
+>><building>2.[[DSTN]Deep Spatio-Temporal Neural Networks for Click-Through Rate Prediction[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BDSTN%5DDeep%20Spatio-Temporal%20Neural%20Networks%20for%20Click-Through%20Rate%20Prediction%5B2019%5D.pdf)  
+>><building>3.[[DTSF]Deep Time-Stream Framework for Click-Through Rate Prediction by Tracking Interest Evolution[2020].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/Next%20Read/%5BDTSF%5DDeep%20Time-Stream%20Framework%20for%20Click-Through%20Rate%20Prediction%20by%20Tracking%20Interest%20Evolution%5B2020%5D.pdf)  
+>>......  
 
     p.s  
     1.DIEN,paper中的控制更新门并没有实际实现,实际上因为keras里面的
