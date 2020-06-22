@@ -1,5 +1,5 @@
-#CTR MODEL ACHIEVE:  
-##>[1]Interactive Model  
+CTR MODEL ACHIEVE:  
+>[1]Interactive Model  
 >>1.[[FM] Fast Context-aware Recommendations with Factorization Machines (UKON 2011).pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/interactive/%5BFM%5D%20Fast%20Context-aware%20Recommendations%20with%20Factorization%20Machines%20(UKON%202011).pdf)  
 >>2.[[PNN] Product-based Neural Networks for User Response Prediction (SJTU 2016).pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/interactive/%5BPNN%5D%20Product-based%20Neural%20Networks%20for%20User%20Response%20Prediction%20(SJTU%202016).pdf)  
 >>3.[[Deep Crossing] Deep Crossing - Web-Scale Modeling without Manually Crafted Combinatorial Features (Microsoft 2016).pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/interactive/%5BDeep%20Crossing%5D%20Deep%20Crossing%20-%20Web-Scale%20Modeling%20without%20Manually%20Crafted%20Combinatorial%20Features%20(Microsoft%202016).pdf)  
