@@ -13,6 +13,8 @@
   [data](https://github.com/TIXhjq/CTR_Function/tree/master/data)=[nn test sample data]  
   
   p.s 每层目录有对应的详细介绍...
+  
+  [部分nn模型小结](https://zhuanlan.zhihu.com/c_1145034612807028736)
       
   不过由于feature_eng基本都是以前收录的,有很多需要重构,还有GNN部分也是,目前可食用只有CTR部分,
-  以后会把他们拼在一起,做成一个快速生成baseline的工具库.  
+  以后会把他们拼在一起,做成从原始数据到final output的工具库.  

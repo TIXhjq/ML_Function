@@ -28,8 +28,6 @@ CTR MODEL ACHIEVE:
     p.s  
     1.DIEN,paper中的控制更新门并没有实际实现,实际上因为keras里面的
     我只弄了standardLstm,但CudnnLstm改动起来有点麻烦，实际上这里是是直接使
-    用weight*hidden_state模型  
-  
-  [部分模型小结](https://zhuanlan.zhihu.com/c_1145034612807028736)  
+    用weight*hidden_state模型    
     
 p.s并不是复现,现在在家没机器,逻辑上应该问题不大,用的部分采样数据,测试模型连通,有问题的话欢迎交流.
