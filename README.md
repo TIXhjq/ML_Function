@@ -1,5 +1,11 @@
 # CTR_Function
 
+![image](https://img.shields.io/badge/author-TIXhjq-orange)
+![image](https://img.shields.io/badge/License-Apache_2.0-blue)
+![image](https://img.shields.io/badge/License-tensorflow2.1-darkgreen)
+![image](https://img.shields.io/badge/python-python3.7-darkgreen)
+
+
   [code](https://github.com/TIXhjq/CTR_Function/tree/master/code)=[nn,feature_eng]  
   [paper](https://github.com/TIXhjq/CTR_Function/tree/master/paper)=[nn(目前只有CTR部分,剩下的下次一定^_^)]  
   [data](https://github.com/TIXhjq/CTR_Function/tree/master/data)=[nn test sample data]  
