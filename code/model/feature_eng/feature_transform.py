@@ -7,8 +7,15 @@ import logging
 
 import gensim
 import matplotlib.pyplot as plt
+from bkcharts.stats import stats
 from gensim.models import Word2Vec
 from pandas import DataFrame
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import PassiveAggressiveClassifier, SGDClassifier, RidgeClassifier, LogisticRegression
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import StratifiedKFold
+from sklearn.svm import LinearSVC
+
 from model.embedding.util.util_tool import save_edgelist
 import re
 from model.embedding.model_test import model_test
@@ -664,3 +671,185 @@ class feature_tool(object):
                 embedding_matrix[i] = embedding_vector
         print("null cnt", count)
         return embedding_matrix
+
+
+    def stat_mode(df, cate_fea, num_fea):
+        aim_ = pd.concat([df.groupby(cate_fea)[num_].agg(
+            {num_ + '_mode': lambda x: stats.mode(x)[0][0], num_ + '_mode_count': lambda x: stats.mode(x)[1][0]}) for num_
+                          in num_fea], axis=1)
+        aim_.reset_index(inplace=True)
+
+        return aim_
+
+    def format_df(self,df, target_id, ad, cate_col):
+        train_df = df[df[target_id].isnull() == False]
+        test_df = df[df[target_id].isnull() == True]
+        train_target = train_df[target_id].values
+        test_target = test_df[target_id].values
+        train_user = train_df[cate_col].tolist()
+        test_user = test_df[cate_col].tolist()
+
+        del df
+        gc.collect()
+        train_upbound = train_df.shape[0]
+        test_upbound = test_df.shape[0]
+
+        inputs = train_df['{}_logs'.format(ad)].tolist() + test_df['{}_logs'.format(ad)].tolist()
+
+        tf_idf = TfidfVectorizer(ngram_range=(1, 1))
+        df = tf_idf.fit_transform(inputs).tocsr()
+        train_df = df[:train_upbound]
+        test_df = df[train_upbound:]
+
+        return (train_df, test_df), (train_target, test_target), (train_upbound, test_upbound), train_user + test_user
+
+
+    def get_sklearn_classfiy_stacking(self,clf, train_feature, test_feature, score, model_name, class_number, n_folds, train_num,
+                                      test_num, target_id):
+        print('\n****开始跑', model_name, '****')
+        stack_train = np.zeros((train_num, class_number))
+        stack_test = np.zeros((test_num, class_number))
+        score_mean = []
+        skf = StratifiedKFold(n_splits=n_folds, random_state=1017)
+        tqdm.desc = model_name
+        for i, (tr, va) in enumerate(skf.split(train_feature, score)):
+            clf.fit(train_feature[tr], score[tr])
+            score_va = clf._predict_proba_lr(train_feature[va])
+            score_te = clf._predict_proba_lr(test_feature)
+            score_single = accuracy_score(score[va], np.argmax(clf._predict_proba_lr(train_feature[va]), axis=1))
+            score_mean.append(np.around(score_single, 5))
+            print('{}+1/{}:{}'.format(i, n_folds, score_single))
+            stack_train[va] += score_va
+            stack_test += score_te
+        stack_test /= n_folds
+        stack = np.vstack([stack_train, stack_test])
+        df_stack = pd.DataFrame()
+        for i in range(stack.shape[1]):
+            df_stack['tfidf_ori_1_1_' + model_name + '_classfiy_{}_{}'.format(i, target_id)] = stack[:, i]
+        print(model_name, '处理完毕')
+        return df_stack, score_mean
+
+
+    def gen_tfidf_fea(self,df, ad_list, label_list, label_classify, cate_fea):
+        model_list = [
+            ['PassiveAggressiveClassifier', PassiveAggressiveClassifier(random_state=1017, C=2, n_jobs=12)],
+            ['LogisticRegression', LogisticRegression(random_state=1017, C=3, n_jobs=12)],
+            ['SGDClassifier', SGDClassifier(random_state=1017, loss='log', n_jobs=12)],
+            ['RidgeClassfiy', RidgeClassifier(random_state=1017)],
+            ['LinearSVC', LinearSVC(random_state=1017, verbose=1)]
+        ]
+
+        tf_list = []
+        for ad in tqdm(ad_list, desc='ad_feature'):
+            print('loading weight')
+            for name, classify in zip(label_list, label_classify):
+                if not os.path.exists('work/tf_idf/tfIdf_feature_{}_label_{}.csv'.format(ad, name)):
+                    df = self.gen_behavior_seq(df=df, cate_fea=cate_fea, item_col=ad)
+                    df = df.merge(pd.read_csv('work/train/train_user.csv', usecols=['phone_no_m', 'label']).rename(
+                        columns={'label': 'target'}), how='left', on=['phone_no_m'])
+                    df, target, upbound, user_df = self.format_df(df, target_id=name, ad=ad, cate_col=cate_fea[0])
+                    feature = pd.DataFrame()
+                    for i in model_list:
+                        stack_result, score_mean = self.get_sklearn_classfiy_stacking(i[1], df[0], df[1], target[0], i[0],
+                                                                                 classify, 5, upbound[0], upbound[1],
+                                                                                 target_id=name)
+                        feature = pd.concat([feature, stack_result], axis=1, sort=False)
+                        print('五折结果', score_mean)
+                        print('平均结果', np.mean(score_mean))
+                    print(feature.head())
+                    feature['phone_no_m'] = user_df
+                    feature.to_csv('work/tf_idf/tfIdf_feature_{}_label_{}.csv'.format(ad, name), index=False)
+                    tf_list.append(feature)
+                else:
+                    tf_list.append(pd.read_csv('work/tf_idf/tfIdf_feature_{}_label_{}.csv'.format(ad, name)))
+
+        return pd.concat(tf_list, axis=1)
+
+
+    def eda_null(self,df):
+        for i in df:
+            print('{}null radio:{}'.format(i, df[i].isnull().sum() / df.shape[0]))
+
+
+    def gen_w2v(self,input_docs, save_path, embed_size=16):
+        logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', level=logging.INFO)
+        w2v = Word2Vec(input_docs, size=embed_size, sg=1, window=10, seed=1017, workers=24, min_count=1, iter=10)
+        w2v.wv.save_word2vec_format(save_path)
+        print("w2v model done")
+
+
+    def get_vec(self,input_docs, cate_fea, item_col, Emed_path, embed_size=8):
+        cate_name = cate_fea
+        if isinstance(cate_fea, list):
+            cate_name = '_'.join(cate_fea)
+        embeddings_dict = gensim.models.KeyedVectors.load_word2vec_format(Emed_path, binary=False)
+        # data=DataFrame(data=[np.sum([embeddings_dict[i] for i in docs],axis=0)for docs in input_docs],columns=['{}_{}_{}_sum'.format(cate_name,item_col,i) for i in range(embed_size)])
+        data = DataFrame(data=[np.mean([embeddings_dict[i] for i in docs], axis=0) for docs in input_docs],
+                         columns=['{}_{}_{}_mean'.format(cate_name, item_col, i) for i in range(embed_size)])
+        # data=pd.concat([data,DataFrame(data=[np.std([embeddings_dict[i] for i in docs],axis=0)for docs in input_docs],columns=['{}_{}_{}_std'.format(cate_name,item_col,i) for i in range(embed_size)])],axis=1)
+        # data=pd.concat([data,DataFrame(data=[np.min([embeddings_dict[i] for i in docs],axis=0)for docs in input_docs],columns=['{}_{}_{}_min'.format(cate_name,item_col,i) for i in range(embed_size)])],axis=1)
+        # data=pd.concat([data,DataFrame(data=[[embeddings_dict[i] for i in docs][-1]for docs in input_docs],columns=['{}_{}_{}_last'.format(cate_name,item_col,i) for i in range(embed_size)])],axis=1)
+
+        return data
+
+
+    def gen_history_seq(self,df, cate_fea, item_col, time_col, embed_size=8):
+        cate_name = cate_fea
+        if isinstance(cate_name, list):
+            cate_name = '_'.join(cate_name)
+        df[item_col] = df[item_col].astype('str')
+        t_ = df[cate_fea + [item_col, time_col]].sort_values(time_col).groupby(cate_fea)[item_col].apply(
+            lambda x: ','.join(x.tolist())).reset_index()
+        save_path = 'work/w2v/{}_{}_{}_w2v.txt'.format(cate_name, item_col, embed_size)
+        input_docs = [i.split(',') for i in t_[item_col].tolist()]
+        if not os.path.exists(save_path):
+            self.gen_w2v(input_docs=input_docs, save_path=save_path, embed_size=embed_size)
+        t_ = pd.concat([t_[cate_fea],
+                        self.get_vec(input_docs=input_docs, cate_fea=cate_fea, Emed_path=save_path, item_col=item_col,
+                                embed_size=embed_size)], axis=1)
+
+        return t_
+
+
+    def stat_fea(self,cate_, num_fea, agg_op, train_df=DataFrame(), test_df=DataFrame(), df=None):
+        ori_df = df
+
+        if not train_df.empty:
+            df = train_df
+
+        t_ = DataFrame()
+        for fea in num_fea:
+            cate_name = cate_
+            if isinstance(cate_, list):
+                cate_name = '_'.join(cate_)
+            op_dict = {'{}_{}_{}'.format(cate_name, fea, agg_): agg_ for agg_ in agg_op}
+            if t_.empty:
+                t_ = df.groupby(cate_)[fea].agg(op_dict)
+            else:
+                t_ = pd.concat([t_, df.groupby(cate_)[fea].agg(op_dict)], axis=1)
+
+        return t_.reset_index()
+
+
+    def batch_stat(self,cate_fea, num_fea, agg_op, train_df=DataFrame(), test_df=DataFrame(), df=None, need_df=None):
+        aim_ = [self.stat_fea(df=df, cate_=cate_, num_fea=num_fea, agg_op=agg_op) for cate_ in tqdm(cate_fea)]
+        return aim_
+
+
+    def gen_behavior_seq(self,df, cate_fea, item_col,time_col):
+        cate_name = cate_fea
+        if isinstance(cate_name, list):
+            cate_name = '_'.join(cate_name)
+        df[item_col] = df[item_col].astype('str')
+        t_ = df[cate_fea + [item_col, time_col]].sort_values(time_col).groupby(cate_fea)[item_col].apply(
+            lambda x: ','.join(x.tolist())).reset_index()
+        t_.rename(columns={item_col: '{}_logs'.format(item_col)}, inplace=True)
+
+        return t_
+
+
+    def format_unstack(self,aim_):
+        aim_.columns = [str(i[0]) + '_' + str(i[1]) for i in aim_.columns.tolist()]
+        aim_.reset_index(inplace=True)
+
+        return aim_
