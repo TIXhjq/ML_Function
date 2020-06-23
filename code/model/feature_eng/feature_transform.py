@@ -26,7 +26,6 @@ import os
 import gc
 import seaborn as sns
 from multiprocessing import Pool
-from deepctr.models import deepfm
 
 warnings.filterwarnings("ignore")
 
@@ -36,7 +35,7 @@ pd.set_option('max_colwidth', 100)
 
 print(os.getcwd())
 #----------------------------------------------------
-from model.base_model import base_model
+from model.feature_eng.base_model import base_model
 data_folder='../../data/'
 origin_data_folder=data_folder+'origin_data/'
 submit_data_folder=data_folder+'submit/'

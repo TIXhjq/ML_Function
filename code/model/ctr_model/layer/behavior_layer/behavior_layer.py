@@ -5,33 +5,7 @@
 @Date   :2020/5/3 上午11:40
 @File   :behavior_layer.py
 ================================='''
-from sklearn.model_selection import KFold, StratifiedKFold
-from sklearn.metrics import mean_squared_error as mse
-from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import f1_score, r2_score
-from hyperopt import fmin, tpe, hp, partial
-from numpy.random import random, shuffle
-import matplotlib.pyplot as plt
-from pandas import DataFrame
-import tensorflow as tf
-from tqdm import tqdm
-from PIL import Image
-import lightgbm as lgb
-import networkx as nx
-import pandas as pd
-import numpy as np
-import warnings
-import cv2
-import os
-import gc
-import re
-import datetime
-import sys
-from model.embedding.setence_model import *
-from model.feature_transform import feature_tool
-from model.base_model import base_model
 from model.ctr_model.layer.core_layer.core_layer import *
-import itertools
 from tensorflow.keras.initializers import glorot_uniform
 from model.ctr_model.layer.behavior_layer.rnn_demo import AUGRU
 

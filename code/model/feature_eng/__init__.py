@@ -2,8 +2,9 @@
 # _*_ coding:utf-8 _*_
 '''=================================
 @Author :tix_hjq
-@Date   :2020/5/29 下午4:01
+@Date   :2020/6/24 上午12:15
 @File   :__init__.py.py
+@email  :hjq1922451756@gmail.com or 1922451756@qq.com  
 ================================='''
 import pandas as pd
 import warnings
@@ -27,6 +28,3 @@ fea_data_folder = data_folder + 'fea_data/'
 model_tool = base_model(submit_data_folder)
 fea_tool = feature_tool(fea_data_folder)
 #-----------------------------------------------------------------
-from model.ctr_model.layer.behavior_layer.behavior_layer import *
-from model.ctr_model.layer.interactive_layer.interactive_layer import *
-from model.ctr_model.layer.core_layer.core_layer import *

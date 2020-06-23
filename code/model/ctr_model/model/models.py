@@ -6,11 +6,6 @@
 @File   :models.py
 ================================='''
 
-import pandas as pd
-import warnings
-import os
-from model.feature_transform import feature_tool
-from model.base_model import base_model
 from utils.data_prepare import data_prepare
 from model.ctr_model.layer import *
 
