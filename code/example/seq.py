@@ -55,8 +55,7 @@ from model.ctr_model.model.models import *
 candidateFea=['item_id','item_cate']
 behaviorFea=['buy_list','cate_list']
 
-# model=DIEN(spareInfo=spareInfo,seqInfo=seqInfo,candidateFea=candidateFea,behaviorFea=behaviorFea)
-model=SeqFM(spareInfo=spareInfo,seqInfo=seqInfo)
+model=DIEN(spareInfo=spareInfo,seqInfo=seqInfo,candidateFea=candidateFea,behaviorFea=behaviorFea)
 print(model.summary())
 model.compile(loss="mean_squared_error",optimizer='adam',metrics=['accuracy'])
 model.fit(train_df,y_train,validation_data=(test_df,y_test),epochs=100,callbacks=[tf.keras.callbacks.EarlyStopping(patience=10,verbose=5)])

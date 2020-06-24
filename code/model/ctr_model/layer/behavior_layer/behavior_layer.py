@@ -8,6 +8,7 @@
 from model.ctr_model.layer.core_layer.core_layer import *
 from tensorflow.keras.initializers import glorot_uniform
 from model.ctr_model.layer.behavior_layer.rnn_demo import AUGRU
+import numpy as np
 
 warnings.filterwarnings("ignore")
 pd.set_option('display.max_columns', None)
@@ -499,29 +500,3 @@ class SessionInterestInteractingLayer(tf.keras.layers.Layer):
         hidden_=self.biLstm(inputs)
 
         return hidden_
-
-class DynamicViewMask(tf.keras.layers.Layer):
-    '''
-        SeqFM seq Mask,Decode Mask
-    '''
-    def __int__(self,mask_mod):
-        super(DynamicViewMask, self).__int__()
-
-    def build(self, input_shape):
-        self.max_len=input_shape[1]
-        self.gen_mask = tf.keras.layers.Masking()
-        super(DynamicViewMask, self).build(input_shape)
-
-    def call(self, inputs, **kwargs):
-        dynamic_mask = tf.convert_to_tensor([[
-            1.0 if i < j else 0.0 for j in range(self.max_len)
-        ] for i in range(self.max_len)])
-
-        return dynamic_mask
-
-
-    def compute_mask(self, inputs, mask=None):
-        dynamic_mask=tf.equal(inputs,0)
-
-        return dynamic_mask
-

@@ -7,7 +7,7 @@ import logging
 
 import gensim
 import matplotlib.pyplot as plt
-from bkcharts.stats import stats
+from scipy.stats import stats
 from gensim.models import Word2Vec
 from pandas import DataFrame
 from sklearn.feature_extraction.text import TfidfVectorizer
