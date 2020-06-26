@@ -57,6 +57,14 @@ class feature_tool(object):
         self.save_folder=save_folder
         self.embedding_folder=save_folder+'embedding_data/'
 
+    def gen_time_interval(self, df, time_col,padding_init=True):
+        padding_ = []
+        if padding_init:
+            padding_=[0]
+
+        return [','.join(np.array(padding_ + np.diff(np.array(i.split(',')).astype('int')).tolist()).astype('str'))
+                for i in df[time_col].tolist()]
+
     def pickle_op(self,path,is_save,file=None):
         if is_save:
             with open(path, "wb") as fp:

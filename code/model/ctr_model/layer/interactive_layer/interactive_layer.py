@@ -5,14 +5,35 @@
 @Date   :2020/5/3 上午11:41
 @File   :interactive_layer.py
 ================================='''
+import itertools
+from sklearn.model_selection import KFold, StratifiedKFold
+from sklearn.metrics import mean_squared_error as mse
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import f1_score, r2_score
+from hyperopt import fmin, tpe, hp, partial
+from numpy.random import random, shuffle
+import matplotlib.pyplot as plt
+from pandas import DataFrame
 import tensorflow as tf
+from tensorflow_core.python.keras.initializers import glorot_uniform
+from tqdm import tqdm
+from PIL import Image
+import lightgbm as lgb
+import networkx as nx
 import pandas as pd
+import numpy as np
 import warnings
+import cv2
 import os
+import gc
+import re
+import datetime
+import sys
+from model.embedding.setence_model import *
 from model.feature_eng.feature_transform import feature_tool
 from model.feature_eng.base_model import base_model
-import itertools
-from tensorflow.keras.initializers import glorot_uniform
+from model.ctr_model.layer.behavior_layer.behavior_layer import *
+from model.ctr_model.layer.core_layer.core_layer import *
 
 warnings.filterwarnings("ignore")
 pd.set_option('display.max_columns', None)
@@ -21,15 +42,16 @@ pd.set_option('max_colwidth', 100)
 
 print(os.getcwd())
 #----------------------------------------------------
-data_folder = '../../data/'
-origin_data_folder = data_folder + 'origin_data/'
-submit_data_folder = data_folder + 'submit_data/'
-eda_data_folder = data_folder + 'eda_data/'
-fea_data_folder = data_folder + 'fea_data/'
+data_folder='../../data/'
+origin_data_folder=data_folder+'origin_data/'
+submit_data_folder=data_folder+'submit_data/'
+eda_data_folder=data_folder+'eda_data/'
+fea_data_folder=data_folder+'fea_data/'
 #-----------------------------------------------------------------
-model_tool = base_model(submit_data_folder)
-fea_tool = feature_tool(fea_data_folder)
+model_tool=base_model(submit_data_folder)
+fea_tool=feature_tool(fea_data_folder)
 #-----------------------------------------------------------------
+
 class InnerLayer(tf.keras.layers.Layer):
     '''
         Interactive layer
@@ -179,13 +201,13 @@ class LinearLayer(tf.keras.layers.Layer):
 class SparseEmbed(tf.keras.layers.Layer):
     '''
         embedding core:
-            supports spare embed & linear
+            supports sparse embed & linear
         supports:
             flatten,add
     '''
-    def __init__(self,spare_info:list,is_linear=False,use_flatten=True,use_add=False,seed=2020,support_masking=True,mask_zero=False):
+    def __init__(self,sparse_info:list,is_linear=False,use_flatten=True,use_add=False,seed=2020,support_masking=True,mask_zero=False):
         super(SparseEmbed,self).__init__()
-        self.spare_info=spare_info
+        self.sparse_info=sparse_info
         self.flatten=None
         self.supports_masking=support_masking
         self.is_linear = is_linear
@@ -194,7 +216,7 @@ class SparseEmbed(tf.keras.layers.Layer):
         self.seed=seed
 
         if use_flatten:
-            self.flatten=[tf.keras.layers.Flatten()for i in spare_info]
+            self.flatten=[tf.keras.layers.Flatten()for i in sparse_info]
         if use_add:
             self.add=tf.keras.layers.Add()
 
@@ -204,18 +226,21 @@ class SparseEmbed(tf.keras.layers.Layer):
                 name=info_.fea_name,input_dim=info_.word_size,output_dim=info_.cross_unit,
                 mask_zero=info_.mask_zero,embeddings_initializer=glorot_uniform(seed=self.seed),
                 input_length=info_.input_length,trainable=info_.is_trainable,weights=info_.pre_weight
-            )for info_ in self.spare_info]
+            ) if info_.cross_unit!=0 else [] for info_ in self.sparse_info]
         else:
             self.embed=[tf.keras.layers.Embedding(
                 name=info_.fea_name,input_dim=info_.word_size,output_dim=info_.linear_unit
-            ) for info_ in self.spare_info]
+            )for info_ in self.sparse_info]
         super(SparseEmbed, self).build(input_shape)
 
     def call(self,inputs,**kwargs):
+
+        embed_list = [emb_(input_) if info_.cross_unit != 0 else input_ for emb_, input_, info_ in
+                      zip(self.embed ,inputs, self.sparse_info)]
+
+
         if self.flatten:
-            embed_list=[flat_(emb_(input_)) for flat_,emb_,input_ in zip(self.flatten,self.embed,inputs)]
-        else:
-            embed_list = [emb_(input_) for emb_, input_ in zip(self.embed, inputs)]
+            embed_list=[flat_(embed_) for flat_,embed_ in zip(self.flatten,embed_list)]
 
         if self.use_add:
             embed_list=self.add(embed_list)
@@ -223,7 +248,7 @@ class SparseEmbed(tf.keras.layers.Layer):
         self.embed_list=embed_list
 
         if self.mask_zero:
-            return embed_list,[emb._keras_mask for emb in embed_list]
+            return embed_list,[emb._keras_mask if info_.cross_unit!=0 else [] for emb,info_ in zip(embed_list,self.sparse_info)]
         else:
             return embed_list
 
@@ -350,3 +375,4 @@ class AttentionBaseLayer(tf.keras.layers.Layer):
         output=self.output_layer(atten_inputs)
 
         return output
+

@@ -5,15 +5,31 @@
 @Date   :2020/5/2 下午5:14
 @File   :data_prepare.py
 ================================='''
+from sklearn.model_selection import KFold, StratifiedKFold
+from sklearn.metrics import mean_squared_error as mse
 from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import f1_score, r2_score
+from hyperopt import fmin, tpe, hp, partial
+from numpy.random import random, shuffle
+import matplotlib.pyplot as plt
 from pandas import DataFrame
 import tensorflow as tf
+from tqdm import tqdm
 from sklearn.preprocessing import MinMaxScaler
+from PIL import Image
+import lightgbm as lgb
+import networkx as nx
 import pandas as pd
 import numpy as np
 import warnings
+import cv2
 import os
+import gc
+import re
+import datetime
+import sys
 from collections import namedtuple
+from model.embedding.setence_model import *
 from model.feature_eng.feature_transform import feature_tool
 from model.feature_eng.base_model import base_model
 
@@ -47,22 +63,22 @@ class data_prepare(object):
 
         return df, (train_idx, test_idx)
 
-    def spare_fea_deal(self,spareDf:DataFrame,embed_dim=8,linear_dim=1,pre_weight=None):
+    def sparse_fea_deal(self,sparseDf:DataFrame,embed_dim=8,linear_dim=1,pre_weight=None):
         if not pre_weight:
-            pre_weight=[None]*spareDf.shape[1]
+            pre_weight=[None]*sparseDf.shape[1]
 
-        spareDf = spareDf.fillna('-1')
-        for fea in spareDf:
-            spareDf[fea]=LabelEncoder().fit_transform(spareDf[fea].astype('str'))
+        sparseDf = sparseDf.fillna('-1')
+        for fea in sparseDf:
+            sparseDf[fea]=LabelEncoder().fit_transform(sparseDf[fea].astype('str'))
 
-        spareInfo=[self.sparseFea(
-            fea_name=fea, input_dim=spareDf[fea].shape[0],
-            cross_unit=embed_dim, linear_unit=linear_dim,word_size=spareDf[fea].nunique(),
+        sparseInfo=[self.sparseFea(
+            fea_name=fea, input_dim=sparseDf[fea].shape[0],
+            cross_unit=embed_dim, linear_unit=linear_dim,word_size=sparseDf[fea].nunique(),
             pre_weight=weight_,input_length=1,is_trainable=True,mask_zero=False,sample_num=None,
             batch_size=self.batch_size
-        ) for fea,weight_ in zip(spareDf,pre_weight)]
+        ) for fea,weight_ in zip(sparseDf,pre_weight)]
 
-        return spareDf,spareInfo
+        return sparseDf,sparseInfo
 
     def single_seq_deal(self,seq_list, is_str_list=True,is_str=False,max_len=None,sample_num=None):
         '''
@@ -132,11 +148,11 @@ class data_prepare(object):
 
         seqInfo=None
         if use_wrap:
-            seqDf,seqInfo=self.spare_wrap(seqDf,seqIdx=seqIdx,embedding_dim=embedding_dim,max_len=max_len,mask_zero=mask_zero,is_trainable=is_trainable,pre_weight=pre_weight,sample_num=sample_num)
+            seqDf,seqInfo=self.sparse_wrap(seqDf,seqIdx=seqIdx,embedding_dim=embedding_dim,max_len=max_len,mask_zero=mask_zero,is_trainable=is_trainable,pre_weight=pre_weight,sample_num=sample_num)
 
         return seqDf,seqIdx,seqInfo
 
-    def spare_wrap(self,seqDf,embedding_dim:list,seqIdx=None,seqIdx_path=None,max_len:list=None,mask_zero=True,is_trainable=True,pre_weight:list=None,sample_num=None):
+    def sparse_wrap(self,seqDf,embedding_dim:list,seqIdx=None,seqIdx_path=None,max_len:list=None,mask_zero=True,is_trainable=True,pre_weight:list=None,sample_num=None):
         if not pre_weight:
             pre_weight=[None]*seqDf.shape[1]
         if not max_len:
@@ -226,9 +242,9 @@ class data_prepare(object):
 
             return df
 
-    def spare_prepare(self, spare_info: list):
+    def sparse_prepare(self, sparse_info: list):
         return [tf.keras.Input(batch_shape=(info_.batch_size,info_.input_length,),
-                               name=info_.fea_name) for info_ in spare_info]
+                               name=info_.fea_name) for info_ in sparse_info]
 
     def dense_fea_deal(self,denseDf:DataFrame,is_fillna=True):
         if is_fillna:
@@ -253,26 +269,26 @@ class data_prepare(object):
         df=self.df_format(df)
         return df
 
-    def df_prepare(self,spareInfo:list=None,denseInfo:list=None,seqInfo:list=None):
+    def df_prepare(self,sparseInfo:list=None,denseInfo:list=None,seqInfo:list=None):
         df_name=[]
         inputs=[[],[],[]]
         if denseInfo:
             dense_inputs=self.dense_prepare(denseInfo)
             df_name+=[info_.fea_name for info_ in denseInfo]
             inputs[0]=dense_inputs
-        if spareInfo:
-            spare_inputs=self.spare_prepare(spareInfo)
-            df_name+=[info_.fea_name for info_ in spareInfo]
-            inputs[1]=spare_inputs
+        if sparseInfo:
+            sparse_inputs=self.sparse_prepare(sparseInfo)
+            df_name+=[info_.fea_name for info_ in sparseInfo]
+            inputs[1]=sparse_inputs
         if seqInfo:
-            seq_inputs=self.spare_prepare(seqInfo)
+            seq_inputs=self.sparse_prepare(seqInfo)
             df_name+=[info_.fea_name for info_ in seqInfo]
             inputs[2]=seq_inputs
 
         return inputs
 
 
-    def extract_train_test(self,train_idx, test_idx,targetDf,spareDf=None, denseDf=None,seqDf=None,use_softmax=True):
+    def extract_train_test(self,train_idx, test_idx,targetDf,sparseDf=None, denseDf=None,seqDf=None,use_softmax=True):
         try:
             train_dense = denseDf.loc[train_idx]
             test_dense = denseDf.loc[test_idx]
@@ -280,10 +296,10 @@ class data_prepare(object):
             train_dense,test_dense=None,None
 
         try:
-            train_spare = spareDf.loc[train_idx]
-            test_spare = spareDf.loc[test_idx]
+            train_sparse = sparseDf.loc[train_idx]
+            test_sparse = sparseDf.loc[test_idx]
         except AttributeError:
-            train_spare, test_spare = None, None
+            train_sparse, test_sparse = None, None
 
         try:
             train_seq={key:seqDf[key][train_idx] for key in seqDf}
@@ -298,8 +314,8 @@ class data_prepare(object):
         y_train=targetDf[train_idx]
         y_test=targetDf[test_idx]
 
-        train_df=self.df_format_input([train_dense,train_spare])
-        test_df=self.df_format_input([test_dense,test_spare])
+        train_df=self.df_format_input([train_dense,train_sparse])
+        test_df=self.df_format_input([test_dense,test_sparse])
         train_df.update(train_seq)
         test_df.update(test_seq)
 

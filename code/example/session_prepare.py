@@ -3,7 +3,7 @@
 '''=================================
 @Author :tix_hjq
 @Date   :2020/5/17 下午4:27
-@File   :new_test.py
+@File   :session_prepare.py
 ================================='''
 from pandas import DataFrame
 import tensorflow as tf
@@ -35,7 +35,7 @@ from utils.data_prepare import data_prepare
 data_format=data_prepare()
 #-----------------------------------------------------------------
 def pareper():
-    context=pd.read_parquet(origin_data_folder+'context.parquet')
+    context=pd.read_parquet(origin_data_folder+'context1.parquet')
     item=pd.read_parquet(origin_data_folder+'item.parquet')
     user=pd.read_csv(origin_data_folder+'user.parquet')
 
@@ -97,7 +97,6 @@ def perpare():
     seqDf,seq_idx,seqInfo=data_format.seq_deal(seqDf=ori_df[['click_item']],embedding_dim=[8],is_str=True,is_str_list=False,use_wrap=False)
     ori_df['click_item']=[','.join([str(j) for j in i]) for i in seqDf['click_item']]
     fea_tool.pickle_op(path=save_folder+'session_seq_idx.pkl',is_save=True,file=seq_idx)
-
 
     return ori_df
 

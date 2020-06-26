@@ -32,22 +32,23 @@ data_pre=data_prepare()
 trainDf=pd.read_csv(origin_data_folder+'seq_train.csv')
 testDf=pd.read_csv(origin_data_folder+'seq_test.csv')
 
-spare_fea=['user_id','item_id','item_cate']
-seq_fea=['buy_list']
+sparse_fea=['user_id','item_id','item_cate']
+seq_fea=['buy_list','cate_list']
+# seq_fea=['buy_list']
 target_fea=['target']
 
 df,(train_idx,test_idx)=data_pre.concat_test_train(trainDf,testDf)
 seqDf=df[seq_fea]
-spareDf=df[spare_fea]
+sparseDf=df[sparse_fea]
 targetDf=df[target_fea]
 
 seqDf,seqIdx,seqInfo=data_pre.seq_deal(
     seqDf,max_len=[90]*2,embedding_dim=[8]*2,mask_zero=True,is_trainable=True,
-    pre_weight=None,sample_num=None)
-spareDf,spareInfo=data_pre.spare_fea_deal(spareDf)
+    pre_weight=None,sample_num=5)
+sparseDf,sparseInfo=data_pre.sparse_fea_deal(sparseDf)
 
 train_df,test_df,y_train,y_test=data_pre.extract_train_test(
-    targetDf=targetDf,test_idx=test_idx,train_idx=train_idx,spareDf=spareDf,seqDf=seqDf)
+    targetDf=targetDf,test_idx=test_idx,train_idx=train_idx,sparseDf=sparseDf,seqDf=seqDf)
 
 
 from model.ctr_model.model.models import *
@@ -55,7 +56,8 @@ from model.ctr_model.model.models import *
 candidateFea=['item_id','item_cate']
 behaviorFea=['buy_list','cate_list']
 
-model=DIEN(spareInfo=spareInfo,seqInfo=seqInfo,candidateFea=candidateFea,behaviorFea=behaviorFea)
+model=DIEN(sparseInfo=sparseInfo,seqInfo=seqInfo,behaviorFea=behaviorFea,candidateFea=candidateFea)
+# model=SeqFM(sparseInfo=sparseInfo,seqInfo=seqInfo)
 print(model.summary())
 model.compile(loss="mean_squared_error",optimizer='adam',metrics=['accuracy'])
 model.fit(train_df,y_train,validation_data=(test_df,y_test),epochs=100,callbacks=[tf.keras.callbacks.EarlyStopping(patience=10,verbose=5)])

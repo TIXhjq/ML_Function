@@ -13,6 +13,7 @@ import warnings
 import os
 from model.feature_eng.feature_transform import feature_tool
 from model.feature_eng.base_model import base_model
+from model.ctr_model.model.models import *
 
 warnings.filterwarnings("ignore")
 pd.set_option('display.max_columns', None)
@@ -40,31 +41,28 @@ testDf=pd.read_csv(origin_data_folder+'session_test.csv')
 
 session_maxLen=10
 session_maxNum=20
-spare_fea=['region','prev','vid','cid','class_id']
+sparse_fea=['region','prev','vid','cid','class_id']
 dense_fea=['title_length']
 seq_fea=['click_item_session']
 target_fea=['label']
 
 df,(train_idx,test_idx)=data_pre.concat_test_train(trainDf,testDf)
 seqDf=df[seq_fea]
-spareDf=df[spare_fea]
+sparseDf=df[sparse_fea]
 denseDf=df[dense_fea]
 targetDf=df[target_fea]
 
-seqDf,seqInfo=data_pre.spare_wrap(seqDf,seqIdx_path=origin_data_folder+'session_seq_idx.pkl',max_len=[session_maxLen*session_maxNum]*1,embedding_dim=[8]*1)
-spareDf,spareInfo=data_pre.spare_fea_deal(spareDf)
+seqDf,seqInfo=data_pre.sparse_wrap(seqDf,seqIdx_path=origin_data_folder+'session_seq_idx.pkl',max_len=[session_maxLen*session_maxNum]*1,embedding_dim=[8]*1)
+sparseDf,sparseInfo=data_pre.sparse_fea_deal(sparseDf)
 denseDf,denseInfo=data_pre.dense_fea_deal(denseDf)
 
 train_df,test_df,y_train,y_test=data_pre.extract_train_test(
-    targetDf=targetDf,test_idx=test_idx,train_idx=train_idx,spareDf=spareDf,seqDf=seqDf,denseDf=denseDf)
-
-from model.ctr_model.model.models import *
+    targetDf=targetDf,test_idx=test_idx,train_idx=train_idx,sparseDf=sparseDf,seqDf=seqDf,denseDf=denseDf)
 
 candidateFea=['vid']
 behaviorFea=['click_item_session']
 
-
-model=SeqFM(spareInfo=spareInfo,seqInfo=seqInfo)
+model=DSIN(sparseInfo=sparseInfo,seqInfo=seqInfo,candidateFea=candidateFea,behaviorFea=behaviorFea)
 print(model.summary())
 model.compile(loss="mean_squared_error",optimizer='adam',metrics=['accuracy'])
 model.fit(train_df,y_train,validation_data=(test_df,y_test),epochs=100,callbacks=[tf.keras.callbacks.EarlyStopping(patience=10,verbose=5)])

@@ -5,10 +5,33 @@
 @Date   :2020/5/3 上午11:40
 @File   :behavior_layer.py
 ================================='''
-from model.ctr_model.layer.core_layer.core_layer import *
-from tensorflow.keras.initializers import glorot_uniform
-from model.ctr_model.layer.behavior_layer.rnn_demo import AUGRU
+from sklearn.model_selection import KFold, StratifiedKFold
+from sklearn.metrics import mean_squared_error as mse
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import f1_score, r2_score
+from hyperopt import fmin, tpe, hp, partial
+from numpy.random import random, shuffle
+import matplotlib.pyplot as plt
+from pandas import DataFrame
+import tensorflow as tf
+from tqdm import tqdm
+from PIL import Image
+import lightgbm as lgb
+import networkx as nx
+import pandas as pd
 import numpy as np
+import warnings
+import cv2
+import os
+import gc
+import re
+import datetime
+import sys
+from model.embedding.setence_model import *
+from model.feature_eng.feature_transform import feature_tool
+from model.feature_eng.base_model import base_model
+from model.ctr_model.layer.interactive_layer.interactive_layer import *
+from model.ctr_model.layer.core_layer.core_layer import *
 
 warnings.filterwarnings("ignore")
 pd.set_option('display.max_columns', None)
@@ -17,15 +40,17 @@ pd.set_option('max_colwidth', 100)
 
 print(os.getcwd())
 #----------------------------------------------------
-data_folder = '../../data/'
-origin_data_folder = data_folder + 'origin_data/'
-submit_data_folder = data_folder + 'submit_data/'
-eda_data_folder = data_folder + 'eda_data/'
-fea_data_folder = data_folder + 'fea_data/'
+data_folder='../../data/'
+origin_data_folder=data_folder+'origin_data/'
+submit_data_folder=data_folder+'submit_data/'
+eda_data_folder=data_folder+'eda_data/'
+fea_data_folder=data_folder+'fea_data/'
 #-----------------------------------------------------------------
-model_tool = base_model(submit_data_folder)
-fea_tool = feature_tool(fea_data_folder)
+model_tool=base_model(submit_data_folder)
+fea_tool=feature_tool(fea_data_folder)
 #-----------------------------------------------------------------
+
+
 class SeqBaseLayer(tf.keras.layers.Layer):
     '''
         DIN's base-seq transform
@@ -161,7 +186,7 @@ class SampleLayer(tf.keras.layers.Layer):
         pos_seq = self.stack(inputs[1:])
         inputs = [tf.squeeze(input_, axis=1) for input_ in inputs]
         neg_seq = self.stack([tf.expand_dims(self.stack(list(np.random.choice(
-            [j for j_idx, j in enumerate(inputs) if j_idx != idx_], size=self.sample_num
+            [j for j_idx, j in enumerate(inputs) if j_idx != idx_], size=self.sample_num,replace=False
         ))), axis=1)for idx_, i in enumerate(inputs)][1:])
 
         return [pos_seq, neg_seq]
@@ -452,6 +477,7 @@ class BiasPositionEncodeLayer(tf.keras.layers.Layer):
 
         return output
 
+
 class SessionDivisonLayer(tf.keras.layers.Layer):
     def __init__(self,sessionMaxLen,sessionMaxNum):
         super(SessionDivisonLayer, self).__init__()
@@ -500,3 +526,128 @@ class SessionInterestInteractingLayer(tf.keras.layers.Layer):
         hidden_=self.biLstm(inputs)
 
         return hidden_
+
+
+class LatentTimeStreamLayer(tf.keras.layers.Layer):
+    '''
+        DST core:
+            cell ode
+    '''
+    def __init__(self,ode_mode,seed=2020,supports_masking=True):
+        '''
+        :param cell_steps:cell num
+        :param ode_mode:
+            >1:sample
+            >2:complex
+        '''
+        super(LatentTimeStreamLayer, self).__init__()
+        self.ode_mode=ode_mode
+        self.seed=seed
+        self.supports_masking=supports_masking
+
+    def build(self, input_shape):
+        super(LatentTimeStreamLayer, self).build(input_shape)
+        self.init_w = self.add_weight(
+            name='init_w', shape=(input_shape[1][-1], input_shape[1][-1]),
+            initializer=glorot_uniform(seed=self.seed)
+        )
+
+        if self.ode_mode==1:
+            self.f=self.add_weight(
+                name='sample_w',shape=(input_shape[0][-1],input_shape[1][-1]),
+                initializer=tf.keras.initializers.zeros()
+            )
+
+        elif self.ode_mode==2:
+            from model.ctr_model.layer import DnnLayer
+            self.f=DnnLayer(hidden_units=[input_shape[1][-1]]*2,hidden_activate=tf.keras.layers.Activation('sigmoid'),res_unit=10)
+
+    def call(self, inputs, mask=None, **kwargs):
+        def step(inputs, states):
+            z = states[0]
+            if self.ode_mode == 1:
+                step_out = inputs * self.f + z
+            elif self.ode_mode == 2:
+                step_out = inputs * self.f(z)  + z
+
+            return step_out, [step_out]
+
+        [t_inputs,init_states]=inputs
+
+        outputs=tf.keras.backend.rnn(step,t_inputs,[init_states],mask=mask)
+
+        return outputs[1]
+
+
+class TimeDecodedLayer(tf.keras.layers.Layer):
+    def __init__(self,sample_num=1,seed=2020,loss_lambda=0.5,supports_masking=True):
+        super(TimeDecodedLayer, self).__init__()
+        self.guideLoss = GuideLossLayer(sample_num=sample_num,loss_lambda=loss_lambda)
+        self.seed=seed
+        self.supports_masking=supports_masking
+
+    def build(self, input_shape):
+        super(TimeDecodedLayer, self).build(input_shape)
+        self.hidden_w=self.add_weight(
+            name='hidden_transform',shape=(input_shape[1][-1],input_shape[0][-1]),
+            initializer=glorot_uniform(seed=self.seed)
+        )
+
+    def call(self, inputs, mask=None, **kwargs):
+        [behavior,hidden]=inputs
+        hiddenT=tf.tensordot(hidden,self.hidden_w,axes=1)
+        loss_=self.guideLoss([behavior,hiddenT],mask=mask)
+        behavior=behavior+hiddenT
+
+        return behavior,loss_
+
+class GuideLossLayer(tf.keras.layers.Layer):
+    def __init__(self,sample_num=5,hidden_units=[8,8],loss_lambda=0.5,supports_masking=True):
+
+        super(GuideLossLayer, self).__init__()
+        self.sample_= SampleLayer(sample_num=sample_num)
+        self.full=[DnnLayer(hidden_units=hidden_units) for i in range(3)]
+        self.loss_lambda=loss_lambda
+        self.dot=tf.keras.layers.Dot(axes=-1)
+        self.supports_masking=supports_masking
+
+
+    def build(self, input_shape):
+        super(GuideLossLayer, self).build(input_shape)
+
+    def call(self, inputs, mask=None, **kwargs):
+        [behavior,hiddenT]=inputs
+        [pos_seq, neg_seq]=self.sample_(behavior)
+        hidden_seq=hiddenT[:,:-1,:]
+        [pos_seq,hidden_seq,neg_seq]=[f_(seq_) for f_,seq_ in zip(self.full,[pos_seq,hidden_seq,neg_seq])]
+
+        pos_=tf.reduce_sum(tf.multiply(pos_seq,hidden_seq),axis=-1)
+        neg_=tf.reduce_sum(tf.multiply(neg_seq,hidden_seq),axis=-1)
+
+        if mask!=None:
+            mask_=tf.cast(mask,dtype=tf.float32)[:,:-1]
+            pos_,neg_=pos_*mask_,neg_*mask_
+
+        pos_neg_=tf.math.log_sigmoid(pos_/(neg_+1e-10))
+
+        return  self.loss_lambda*tf.reduce_mean(tf.reduce_sum(pos_+neg_-pos_neg_,axis=1))
+
+
+class TimeStreamLayer(tf.keras.layers.Layer):
+    def __init__(self,ode_mode,sample_num=1,seed=2020,loss_lambda=0.5,trainable=True,supports_masking=True):
+        super(TimeStreamLayer, self).__init__()
+        self.lts=LatentTimeStreamLayer(ode_mode=ode_mode,seed=seed)
+        self.decode=TimeDecodedLayer(sample_num=sample_num,seed=seed,loss_lambda=loss_lambda)
+        self.trainable=trainable
+        self.supports_masking=supports_masking
+
+
+    def build(self, input_shape):
+        super(TimeStreamLayer, self).build(input_shape)
+
+    def call(self, inputs, mask=None, **kwargs):
+        [t_inputs,init_states,behavior]=inputs
+        hidden=self.lts([t_inputs,init_states])
+        behavior,loss_=self.decode([behavior,hidden],mask=mask)
+
+        return behavior,loss_

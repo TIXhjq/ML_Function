@@ -5,9 +5,35 @@
 @Date   :2020/5/3 上午9:13
 @File   :models.py
 ================================='''
-
+from sklearn.model_selection import KFold, StratifiedKFold
+from sklearn.metrics import mean_squared_error as mse
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import f1_score, r2_score
+from hyperopt import fmin, tpe, hp, partial
+from numpy.random import random, shuffle
+import matplotlib.pyplot as plt
+from pandas import DataFrame
+import tensorflow as tf
+from tqdm import tqdm
+from PIL import Image
+import lightgbm as lgb
+import networkx as nx
+import pandas as pd
+import numpy as np
+import warnings
+import cv2
+import os
+import gc
+import re
+import datetime
+import sys
+from model.embedding.setence_model import *
+from model.feature_eng.feature_transform import feature_tool
+from model.feature_eng.base_model import base_model
+from model.ctr_model.layer.interactive_layer.interactive_layer import *
+from model.ctr_model.layer.core_layer.core_layer import *
+from model.ctr_model.layer.behavior_layer.behavior_layer import *
 from utils.data_prepare import data_prepare
-from model.ctr_model.layer import *
 
 warnings.filterwarnings("ignore")
 pd.set_option('display.max_columns', None)
@@ -16,39 +42,41 @@ pd.set_option('max_colwidth', 100)
 
 print(os.getcwd())
 #----------------------------------------------------
-data_folder = '../../data/'
-origin_data_folder = data_folder + 'origin_data/'
-submit_data_folder = data_folder + 'submit_data/'
-eda_data_folder = data_folder + 'eda_data/'
-fea_data_folder = data_folder + 'fea_data/'
+data_folder='../../data/'
+origin_data_folder=data_folder+'origin_data/'
+submit_data_folder=data_folder+'submit_data/'
+eda_data_folder=data_folder+'eda_data/'
+fea_data_folder=data_folder+'fea_data/'
+
 #-----------------------------------------------------------------
-model_tool = base_model(submit_data_folder)
-fea_tool = feature_tool(fea_data_folder)
+model_tool=base_model(submit_data_folder)
+fea_tool=feature_tool(fea_data_folder)
 prepare_tool=data_prepare()
 #-----------------------------------------------------------------
-def TestModel(spareInfo):
-    [dense_inputs, spare_inputs, seq_inputs] = prepare_tool.df_prepare(spareInfo=spareInfo)
-    cross_embed = SparseEmbed(spareInfo)(spare_inputs)
+
+def TestModel(sparseInfo):
+    [dense_inputs, sparse_inputs, seq_inputs] = prepare_tool.df_prepare(sparseInfo=sparseInfo)
+    cross_embed = SparseEmbed(sparseInfo)(sparse_inputs)
     input_=StackLayer()(cross_embed)
     dnn_output=DnnLayer(hidden_units=[100,10])(input_)
     output=MergeScoreLayer(use_merge=False)(dnn_output)
-    return tf.keras.Model(dense_inputs+spare_inputs+seq_inputs,output)
+    return tf.keras.Model(dense_inputs+sparse_inputs+seq_inputs,output)
 
-def FM(spareInfo:list=None):
-    [dense_inputs, spare_inputs,seq_inputs]= prepare_tool.df_prepare(spareInfo=spareInfo)
-    cross_embed=SparseEmbed(spareInfo)(spare_inputs)
-    linear=SparseEmbed(spareInfo,is_linear=True)(spare_inputs)
+def FM(sparseInfo:list=None):
+    [dense_inputs, sparse_inputs,seq_inputs]= prepare_tool.df_prepare(sparseInfo=sparseInfo)
+    cross_embed=SparseEmbed(sparseInfo)(sparse_inputs)
+    linear=SparseEmbed(sparseInfo,is_linear=True)(sparse_inputs)
     embed_list=[cross_embed,linear]
     fm_=FmLayer()(embed_list)
     output=MergeScoreLayer(use_merge=False)(fm_)
-    return tf.keras.Model(dense_inputs+spare_inputs,output)
+    return tf.keras.Model(dense_inputs+sparse_inputs,output)
 
-def PNN(spareInfo:list=None,denseInfo:list=None,hidden_units=None,use_inner=True,use_outer=True):
+def PNN(sparseInfo:list=None,denseInfo:list=None,hidden_units=None,use_inner=True,use_outer=True):
     if hidden_units is None:
         hidden_units=[256,256,256]
-    [dense_inputs, spare_inputs,seq_inputs]= prepare_tool.df_prepare(denseInfo=denseInfo, spareInfo=spareInfo)
-    cross_embed = SparseEmbed(spareInfo,use_flatten=False)(spare_inputs)
-    linear = SparseEmbed(spareInfo, is_linear=True)(spare_inputs)
+    [dense_inputs, sparse_inputs,seq_inputs]= prepare_tool.df_prepare(denseInfo=denseInfo, sparseInfo=sparseInfo)
+    cross_embed = SparseEmbed(sparseInfo,use_flatten=False)(sparse_inputs)
+    linear = SparseEmbed(sparseInfo, is_linear=True)(sparse_inputs)
     cross_fea=linear
 
     if use_inner:
@@ -59,39 +87,39 @@ def PNN(spareInfo:list=None,denseInfo:list=None,hidden_units=None,use_inner=True
     dnn_ = DnnLayer(hidden_units)(cross_fea)
     output=MergeScoreLayer(use_merge=False)(dnn_)
 
-    return tf.keras.Model(spare_inputs,output)
+    return tf.keras.Model(sparse_inputs,output)
 
-def DeepCross(spareInfo:list=None, hidden_units=None):
+def DeepCross(sparseInfo:list=None, hidden_units=None):
     if hidden_units is None:
         hidden_units = [256, 256, 256]
-        [dense_inputs, spare_inputs,seq_inputs] = prepare_tool.df_prepare(spareInfo=spareInfo)
-        cross_embed = SparseEmbed(spareInfo,use_flatten=True)(spare_inputs)
+        [dense_inputs, sparse_inputs,seq_inputs] = prepare_tool.df_prepare(sparseInfo=sparseInfo)
+        cross_embed = SparseEmbed(sparseInfo,use_flatten=True)(sparse_inputs)
         dnn_inputs=StackLayer()(dense_inputs+cross_embed)
 
         dnn_fea=DnnLayer(hidden_units=hidden_units)(dnn_inputs)
         output=MergeScoreLayer(use_merge=False)(dnn_fea)
 
-        return tf.keras.Model(spare_inputs,output)
+        return tf.keras.Model(sparse_inputs,output)
 
-def Wide_Deep(spareInfo:list=None, denseInfo:list=None, hidden_units=None):
+def Wide_Deep(sparseInfo:list=None, denseInfo:list=None, hidden_units=None):
     if hidden_units is None:
         hidden_units = [256, 128, 64]
-    [dense_inputs, spare_inputs,seq_inputs]= prepare_tool.df_prepare(denseInfo=denseInfo, spareInfo=spareInfo)
-    cross_ = SparseEmbed(spareInfo,use_flatten=True)(spare_inputs)
-    linear_ = SparseEmbed(spareInfo, is_linear=True)(spare_inputs)
+    [dense_inputs, sparse_inputs,seq_inputs]= prepare_tool.df_prepare(denseInfo=denseInfo, sparseInfo=sparseInfo)
+    cross_ = SparseEmbed(sparseInfo,use_flatten=True)(sparse_inputs)
+    linear_ = SparseEmbed(sparseInfo, is_linear=True)(sparse_inputs)
     dnn_inputs=StackLayer()(dense_inputs+cross_)
 
     dnn_=DnnLayer(hidden_units=hidden_units)(dnn_inputs)
     output=MergeScoreLayer()(linear_+[dnn_])
 
-    return tf.keras.Model(dense_inputs+spare_inputs,output)
+    return tf.keras.Model(dense_inputs+sparse_inputs,output)
 
-def DeepFM(spareInfo:list=None, denseInfo:list=None, hidden_units=None):
+def DeepFM(sparseInfo:list=None, denseInfo:list=None, hidden_units=None):
     if hidden_units is None:
         hidden_units = [256, 128, 64]
-    [dense_inputs, spare_inputs,seq_inputs] = prepare_tool.df_prepare(denseInfo=denseInfo, spareInfo=spareInfo)
-    cross_embed = SparseEmbed(spareInfo)(spare_inputs)
-    linear = SparseEmbed(spareInfo, is_linear=True)(spare_inputs)
+    [dense_inputs, sparse_inputs,seq_inputs] = prepare_tool.df_prepare(denseInfo=denseInfo, sparseInfo=sparseInfo)
+    cross_embed = SparseEmbed(sparseInfo)(sparse_inputs)
+    linear = SparseEmbed(sparseInfo, is_linear=True)(sparse_inputs)
     embed_list = [cross_embed, linear]
 
     fm_=FmLayer()(embed_list)
@@ -99,32 +127,32 @@ def DeepFM(spareInfo:list=None, denseInfo:list=None, hidden_units=None):
     dnn_ = DnnLayer(hidden_units=hidden_units)(dnn_input)
     output = MergeScoreLayer()([fm_, dnn_])
 
-    return tf.keras.Model(dense_inputs+spare_inputs, output)
+    return tf.keras.Model(dense_inputs+sparse_inputs, output)
 
-def DCN(spareInfo:list=None,denseInfo:list=None,hidden_units=None,cross_hidden=3):
+def DCN(sparseInfo:list=None,denseInfo:list=None,hidden_units=None,cross_hidden=3):
     '''
         Notice:
             cross_hidden==> iter_num(x^k=w(x^k-1*x0)+b+x0)
     '''
     if hidden_units is None:
         hidden_units = [256, 128, 64]
-    [dense_inputs, spare_inputs,seq_inputs]= prepare_tool.df_prepare(denseInfo=denseInfo, spareInfo=spareInfo)
-    cross_embed = SparseEmbed(spareInfo,use_flatten=False)(spare_inputs)
+    [dense_inputs, sparse_inputs,seq_inputs]= prepare_tool.df_prepare(denseInfo=denseInfo, sparseInfo=sparseInfo)
+    cross_embed = SparseEmbed(sparseInfo,use_flatten=False)(sparse_inputs)
     combine_inputs=StackLayer()(dense_inputs+cross_embed)
 
     cross_fea=CrossLayer(cross_hidden=cross_hidden)(combine_inputs)
     deep_fea=DnnLayer(hidden_units=hidden_units)(combine_inputs)
     output=MergeScoreLayer()([cross_fea,deep_fea])
 
-    return tf.keras.Model(dense_inputs+spare_inputs,output)
+    return tf.keras.Model(dense_inputs+sparse_inputs,output)
 
-def NFM(spareInfo:list=None,hidden_units=None,denseInfo:list=None):
+def NFM(sparseInfo:list=None,hidden_units=None,denseInfo:list=None):
     if hidden_units is None:
         hidden_units = [256, 128, 64]
-    [dense_inputs, spare_inputs,seq_inputs] = prepare_tool.df_prepare(
-        spareInfo=spareInfo,denseInfo=denseInfo)
-    cross_embed = SparseEmbed(spareInfo, use_flatten=True)(spare_inputs)
-    linear_embed = SparseEmbed(spareInfo,is_linear=True)(spare_inputs)
+    [dense_inputs, sparse_inputs,seq_inputs] = prepare_tool.df_prepare(
+        sparseInfo=sparseInfo,denseInfo=denseInfo)
+    cross_embed = SparseEmbed(sparseInfo, use_flatten=True)(sparse_inputs)
+    linear_embed = SparseEmbed(sparseInfo,is_linear=True)(sparse_inputs)
 
     cross_inputs=InnerLayer(use_inner=True,use_add=True)(cross_embed)
     dnn_inputs=StackLayer()(dense_inputs+[cross_inputs])
@@ -133,9 +161,9 @@ def NFM(spareInfo:list=None,hidden_units=None,denseInfo:list=None):
     final_fea=tf.keras.layers.Add()(linear_embed+[dnn_fea])
     output=ScoreLayer()(final_fea)
 
-    return tf.keras.Model(dense_inputs+spare_inputs,output)
+    return tf.keras.Model(dense_inputs+sparse_inputs,output)
 
-def XDeepFM(spareInfo:list=None, denseInfo:list=None, conv_size=None, hidden_units=None):
+def XDeepFM(sparseInfo:list=None, denseInfo:list=None, conv_size=None, hidden_units=None):
     '''
     :param conv_size:
         notice:conv_size decision Hk<size>
@@ -144,35 +172,35 @@ def XDeepFM(spareInfo:list=None, denseInfo:list=None, conv_size=None, hidden_uni
         conv_size = [200, 200, 200]
     if hidden_units is None:
         hidden_units = [256, 128, 64]
-    [dense_inputs, spare_inputs,seq_inputs] = prepare_tool.df_prepare(
-        spareInfo=spareInfo,denseInfo=denseInfo)
-    cross_embed = SparseEmbed(spareInfo, use_flatten=False)(spare_inputs)
+    [dense_inputs, sparse_inputs,seq_inputs] = prepare_tool.df_prepare(
+        sparseInfo=sparseInfo,denseInfo=denseInfo)
+    cross_embed = SparseEmbed(sparseInfo, use_flatten=False)(sparse_inputs)
     cin_inputs=tf.keras.layers.Concatenate(axis=1)(cross_embed)
     dnn_inputs=StackLayer()(dense_inputs+cross_embed)
 
     linear_output = SparseEmbed(
-        spareInfo, use_flatten=True, is_linear=True, use_add=True)(spare_inputs)
+        sparseInfo, use_flatten=True, is_linear=True, use_add=True)(sparse_inputs)
     cin_output=CIN(conv_size=conv_size,output_dim=1)(cin_inputs)
     dnn_output=DnnLayer(hidden_units=hidden_units,output_dim=1)(dnn_inputs)
     output=ScoreLayer()(tf.keras.layers.Add()([linear_output,cin_output,dnn_output]))
 
-    return tf.keras.Model(dense_inputs+spare_inputs,output)
+    return tf.keras.Model(dense_inputs+sparse_inputs,output)
 
 
-def AFM(spareInfo:list=None,denseInfo:list=None):
-    [dense_inputs, spare_inputs,seq_inputs] = prepare_tool.df_prepare(
-        spareInfo=spareInfo, denseInfo=denseInfo)
-    cross_embed = SparseEmbed(spareInfo, use_flatten=False)(spare_inputs)
-    linear_embed = SparseEmbed(spareInfo, use_flatten=True,is_linear=True)(spare_inputs)
+def AFM(sparseInfo:list=None,denseInfo:list=None):
+    [dense_inputs, sparse_inputs,seq_inputs] = prepare_tool.df_prepare(
+        sparseInfo=sparseInfo, denseInfo=denseInfo)
+    cross_embed = SparseEmbed(sparseInfo, use_flatten=False)(sparse_inputs)
+    linear_embed = SparseEmbed(sparseInfo, use_flatten=True,is_linear=True)(sparse_inputs)
 
     cross_output=InnerLayer()(cross_embed)
     atten_output=AttentionBaseLayer()(cross_output)
     output=ScoreLayer(use_add=True)(linear_embed+[atten_output])
 
-    return tf.keras.Model(dense_inputs+spare_inputs,output)
+    return tf.keras.Model(dense_inputs+sparse_inputs,output)
 
 
-def AutoInt(spareInfo:list=None,denseInfo:list=None,attention_dim=8,attention_head_dim=3):
+def AutoInt(sparseInfo:list=None,denseInfo:list=None,attention_dim=8,attention_head_dim=3):
     '''
         notice:
             origin inputs=[dense+sparse],now inputs=[sparse]
@@ -181,18 +209,18 @@ def AutoInt(spareInfo:list=None,denseInfo:list=None,attention_dim=8,attention_he
         core:
             multHead to replace inner of fm
     '''
-    [dense_inputs, spare_inputs, seq_inputs] = prepare_tool.df_prepare(
-        spareInfo=spareInfo, denseInfo=denseInfo)
-    cross_embed = StackLayer(use_flat=False,axis=1)(SparseEmbed(spareInfo, use_flatten=False)(spare_inputs))
+    [dense_inputs, sparse_inputs, seq_inputs] = prepare_tool.df_prepare(
+        sparseInfo=sparseInfo, denseInfo=denseInfo)
+    cross_embed = StackLayer(use_flat=False,axis=1)(SparseEmbed(sparseInfo, use_flatten=False)(sparse_inputs))
     atten_layer=MultHeadAttentionLayer(attention_dim=attention_dim,attention_head_dim=attention_head_dim,use_ln=True,atten_mask_mod=1)
     atten_vec=DnnLayer(res_unit=1,other_dense=[atten_layer])(cross_embed)
     final_input=StackLayer(use_flat=True,axis=-1)([tf.squeeze(i,0) for i in tf.split(atten_vec,[1]*atten_vec.shape[0])])
     output=MergeScoreLayer(use_merge=False)(final_input)
 
-    return tf.keras.Model(dense_inputs+spare_inputs+seq_inputs,output)
+    return tf.keras.Model(dense_inputs+sparse_inputs+seq_inputs,output)
 
 
-def DIN(spareInfo:list=None, denseInfo:list=None, seqInfo:list=None, candidateFea=None, behaviorFea=None,
+def DIN(sparseInfo:list=None, denseInfo:list=None, seqInfo:list=None, candidateFea=None, behaviorFea=None,
         attention_units=None, hidden_units=None):
     '''
         Notice:
@@ -213,11 +241,11 @@ def DIN(spareInfo:list=None, denseInfo:list=None, seqInfo:list=None, candidateFe
         hidden_units = [256, 256, 256]
     if attention_units is None:
         attention_units = [100, 64, 32]
-    [dense_inputs, spare_inputs,seq_inputs] = prepare_tool.df_prepare(
-        spareInfo=spareInfo, denseInfo=denseInfo ,seqInfo=seqInfo)
-    cross_embed = SparseEmbed(spareInfo, use_flatten=False)(spare_inputs)
+    [dense_inputs, sparse_inputs,seq_inputs] = prepare_tool.df_prepare(
+        sparseInfo=sparseInfo, denseInfo=denseInfo ,seqInfo=seqInfo)
+    cross_embed = SparseEmbed(sparseInfo, use_flatten=False)(sparse_inputs)
     seq_embed,behavior_mask= SparseEmbed(seqInfo, use_flatten=False, is_linear=False,mask_zero=True)(seq_inputs)
-    candidate_embed=ExtractLayer(candidateFea,spare_inputs)(cross_embed)
+    candidate_embed=ExtractLayer(candidateFea,sparse_inputs)(cross_embed)
     behavior_embed=ExtractLayer(behaviorFea,seq_inputs,mask_zero=True)(seq_embed)
 
     base_behavior=SeqBaseLayer()(seq_embed)
@@ -227,9 +255,9 @@ def DIN(spareInfo:list=None, denseInfo:list=None, seqInfo:list=None, candidateFe
     mlp_output=DnnLayer(hidden_units=hidden_units,hidden_activate=tf.keras.layers.PReLU(),res_unit=2,use_bn=True)(final_inputs)
     output=MergeScoreLayer(use_merge=False)(mlp_output)
 
-    return tf.keras.Model(dense_inputs+spare_inputs+seq_inputs,output)
+    return tf.keras.Model(dense_inputs+sparse_inputs+seq_inputs,output)
 
-def DIEN(denseInfo:list=None, spareInfo:list=None, seqInfo:list=None,
+def DIEN(denseInfo:list=None, sparseInfo:list=None, seqInfo:list=None,
          candidateFea=None, behaviorFea=None, classify_units=None, hidden_units=None,
          attention_units=None,sample_num=5):
     '''
@@ -249,12 +277,12 @@ def DIEN(denseInfo:list=None, spareInfo:list=None, seqInfo:list=None,
     if hidden_units is None:
         hidden_units = [256, 256, 256]
 
-    [dense_inputs, spare_inputs, seq_inputs] = prepare_tool.df_prepare(spareInfo=spareInfo, denseInfo=denseInfo,seqInfo=seqInfo)
-    cross_embed = SparseEmbed(spareInfo, use_flatten=False)(spare_inputs)
+    [dense_inputs, sparse_inputs, seq_inputs] = prepare_tool.df_prepare(sparseInfo=sparseInfo, denseInfo=denseInfo,seqInfo=seqInfo)
+    cross_embed = SparseEmbed(sparseInfo, use_flatten=False)(sparse_inputs)
     seq_embed,seq_mask= SparseEmbed(seqInfo, use_flatten=False, is_linear=False,mask_zero=True)(seq_inputs)
 
     behavior_embed=StackLayer(use_flat=False)(ExtractLayer(behaviorFea,seq_inputs,mask_zero=True)(seq_embed))
-    candidate_embed=StackLayer(use_flat=False)(ExtractLayer(candidateFea,spare_inputs)(cross_embed))
+    candidate_embed=StackLayer(use_flat=False)(ExtractLayer(candidateFea,sparse_inputs)(cross_embed))
 
     behavior_sample = SampleLayer(sample_num=sample_num)(behavior_embed)
     [hidden_list,aux_loss]=InterestExtratorLayer(classify_units=classify_units,sample_num=sample_num)([behavior_embed,behavior_sample],mask=seq_mask[0])
@@ -264,11 +292,11 @@ def DIEN(denseInfo:list=None, spareInfo:list=None, seqInfo:list=None,
     output=DnnLayer(hidden_units=hidden_units,hidden_activate=tf.keras.layers.PReLU())(final_input)
     output=MergeScoreLayer(use_merge=False,output_dim=2)(output)
 
-    model=tf.keras.Model(dense_inputs + spare_inputs + seq_inputs, output)
+    model=tf.keras.Model(dense_inputs + sparse_inputs + seq_inputs, output)
     model.add_loss(aux_loss)
     return model
 
-def DSIN(denseInfo:list=None, spareInfo:list=None, seqInfo:list=None,
+def DSIN(denseInfo:list=None, sparseInfo:list=None, seqInfo:list=None,
          candidateFea=None, behaviorFea=None,attention_dim=8,attention_head_dim=5,ffn_hidden_unit=10,
          lstm_units=8,lstm_mode='sum',attention_units=None,classify_units=None,sessionMaxLen=10,sessionMaxNum=20):
 
@@ -277,12 +305,12 @@ def DSIN(denseInfo:list=None, spareInfo:list=None, seqInfo:list=None,
     if classify_units is None:
         classify_units = [100, 64, 32]
 
-    [dense_inputs, spare_inputs, seq_inputs] = prepare_tool.df_prepare(spareInfo=spareInfo, denseInfo=denseInfo,seqInfo=seqInfo)
-    spare_embed = SparseEmbed(spareInfo, use_flatten=False)(spare_inputs)
+    [dense_inputs, sparse_inputs, seq_inputs] = prepare_tool.df_prepare(sparseInfo=sparseInfo, denseInfo=denseInfo,seqInfo=seqInfo)
+    sparse_embed = SparseEmbed(sparseInfo, use_flatten=False)(sparse_inputs)
     seq_embed,seq_mask= SparseEmbed(seqInfo, use_flatten=False, is_linear=False,mask_zero=True)(seq_inputs)
 
     behavior_embed=StackLayer(use_flat=False)(ExtractLayer(behaviorFea,seq_inputs,mask_zero=True)(seq_embed))
-    candidate_embed=StackLayer(use_flat=False)(ExtractLayer(candidateFea,spare_inputs)(spare_embed))
+    candidate_embed=StackLayer(use_flat=False)(ExtractLayer(candidateFea,sparse_inputs)(sparse_embed))
 
     pos_behavior=SessionDivisonLayer(sessionMaxLen=sessionMaxLen,sessionMaxNum=sessionMaxNum)(behavior_embed)
     self_behavior=SessionInterestExtractorLayer(attention_dim=attention_dim,attention_head_dim=attention_head_dim,ffn_hidden_unit=ffn_hidden_unit)(pos_behavior)
@@ -290,13 +318,14 @@ def DSIN(denseInfo:list=None, spareInfo:list=None, seqInfo:list=None,
     self_atten=ActivationUnitLayer(attention_units,need_stack=False)([candidate_embed,self_behavior],mask=seq_mask[0])
     hidden_behavior=SessionInterestInteractingLayer(biLstmUnit=lstm_units,lstm_mode=lstm_mode)(self_behavior)
     lstm_atten=ActivationUnitLayer(attention_units,need_stack=False)([candidate_embed,hidden_behavior],mask=seq_mask[0])
-    dnn_inputs=StackLayer(use_flat=True)(spare_embed+dense_inputs+[self_atten,lstm_atten])
+    dnn_inputs=StackLayer(use_flat=True)(sparse_embed+dense_inputs+[self_atten,lstm_atten])
     output=DnnLayer(hidden_units=classify_units,use_bn=True,res_unit=2)(dnn_inputs)
     output=MergeScoreLayer(use_merge=False,output_dim=2)(output)
 
-    return tf.keras.Model(dense_inputs+spare_inputs+seq_inputs,output)
+    return tf.keras.Model(dense_inputs+sparse_inputs+seq_inputs,output)
 
-def SeqFM(denseInfo:list=None, spareInfo:list=None, seqInfo:list=None,hidden_units=None,res_unit=1,
+
+def SeqFM(denseInfo:list=None, sparseInfo:list=None, seqInfo:list=None,hidden_units=None,res_unit=1,
           atten_dim=8,atten_head=1):
     def DynamicViewMask(seq_shape):
         max_len = seq_shape[1]
@@ -308,11 +337,11 @@ def SeqFM(denseInfo:list=None, spareInfo:list=None, seqInfo:list=None,hidden_uni
         return seq_mask
 
     def CrossViewMask(cross_inputs:list):
-        max_len,spare_len = cross_inputs[0].shape[1],cross_inputs[1].shape[1]
-        m = spare_len - 1
+        max_len,sparse_len = cross_inputs[0].shape[1],cross_inputs[1].shape[1]
+        m = sparse_len - 1
         cross_mask = tf.convert_to_tensor([
         [0.0 if (i <= m and j > m) or (j <= m and i > m) else 1.0
-        for j in range(max_len + spare_len)] for i in range(max_len + spare_len)])
+        for j in range(max_len + sparse_len)] for i in range(max_len + sparse_len)])
 
         cross_mask = tf.equal(cross_mask, 0)
         inputs = tf.concat(cross_inputs, axis=1)
@@ -322,41 +351,59 @@ def SeqFM(denseInfo:list=None, spareInfo:list=None, seqInfo:list=None,hidden_uni
     if hidden_units is None:
         hidden_units = [atten_dim]*2
 
-    [dense_inputs, spare_inputs, seq_inputs] = prepare_tool.df_prepare(spareInfo=spareInfo, denseInfo=denseInfo,seqInfo=seqInfo)
-    linear = SparseEmbed(spareInfo, is_linear=True)(spare_inputs)
-    spare_embed = StackLayer(axis=1,use_flat=False)(SparseEmbed(spareInfo, use_flatten=False)(spare_inputs))
+    [dense_inputs, sparse_inputs, seq_inputs] = prepare_tool.df_prepare(sparseInfo=sparseInfo, denseInfo=denseInfo,seqInfo=seqInfo)
+    linear = SparseEmbed(sparseInfo, is_linear=True)(sparse_inputs)
+    sparse_embed = StackLayer(axis=1,use_flat=False)(SparseEmbed(sparseInfo, use_flatten=False)(sparse_inputs))
     seq_embed= StackLayer(use_flat=False)(SparseEmbed(seqInfo, use_flatten=False, is_linear=False,mask_zero=False)(seq_inputs))
 
-    spare_atten=MultHeadAttentionLayer(attention_dim=atten_dim,attention_head_dim=atten_head)(spare_embed)
-    spare_view=IntraViewPoolingLayer()(spare_atten)
+    sparse_atten=MultHeadAttentionLayer(attention_dim=atten_dim,attention_head_dim=atten_head)(sparse_embed)
+    sparse_view=IntraViewPoolingLayer()(sparse_atten)
 
     seq_mask=DynamicViewMask(seq_embed.shape)
     seq_atten=MultHeadAttentionLayer(attention_dim=atten_dim,attention_head_dim=atten_head,atten_mask_mod=2)(seq_embed,mask=seq_mask)
     seq_view=IntraViewPoolingLayer()(seq_atten)
 
-    cross_inputs,cross_mask=CrossViewMask([seq_embed,spare_embed])
+    cross_inputs,cross_mask=CrossViewMask([seq_embed,sparse_embed])
     cross_atten=MultHeadAttentionLayer(attention_dim=atten_dim,attention_head_dim=atten_head,atten_mask_mod=2)(cross_inputs,mask=cross_mask)
     cross_view=IntraViewPoolingLayer()(cross_atten)
 
-    ffn_inputs=StackLayer(use_flat=False,axis=1)([spare_view,seq_view,cross_view])
+    ffn_inputs=StackLayer(use_flat=False,axis=1)([sparse_view,seq_view,cross_view])
     ffn_output=DnnLayer(hidden_units=hidden_units,use_flatten=True,use_ln=True,use_bn=False,res_unit=res_unit)(ffn_inputs)
 
     output=MergeScoreLayer(use_merge=True,output_dim=2)(linear+[ffn_output])
     # output=ScoreLayer(use_add=True,use_global=True)(linear + [ffn_output])
 
-    return tf.keras.Model(dense_inputs+spare_inputs+seq_inputs,output)
+    return tf.keras.Model(dense_inputs+sparse_inputs+seq_inputs,output)
 
 
-def DTSF(denseInfo: list = None, spareInfo: list = None, seqInfo: list = None):
-    [dense_inputs, spare_inputs, seq_inputs] = prepare_tool.df_prepare(spareInfo=spareInfo, denseInfo=denseInfo,
-                                                                       seqInfo=seqInfo)
-    spare_embed = SparseEmbed(spareInfo, use_flatten=False)(spare_inputs)
+def DTSF(denseInfo: list = None, sparseInfo: list = None, seqInfo: list = None,
+         userFea:list=None,timestampFea:list=None,behaviorFea:list=None,ode_mode=1,
+         sample_num=1,is_train=True,loss_lambda:int=0.5):
+
+    [dense_inputs, sparse_inputs, seq_inputs] = prepare_tool.df_prepare(sparseInfo=sparseInfo, denseInfo=denseInfo,seqInfo=seqInfo)
+    sparse_embed = SparseEmbed(sparseInfo, use_flatten=False)(sparse_inputs)
+    seq_embed,seq_mask= SparseEmbed(seqInfo, use_flatten=False, is_linear=False,mask_zero=True)(seq_inputs)
+
+    timestampEmbed = tf.expand_dims(StackLayer(use_flat=False)(ExtractLayer(timestampFea, seq_inputs)(seq_embed)),axis=-1)
+    behaviorEmbed = StackLayer(use_flat=False)(ExtractLayer(behaviorFea, seq_inputs)(seq_embed))
+    userEmbed = tf.squeeze(StackLayer(use_flat=False)(ExtractLayer(userFea, sparse_inputs)(sparse_embed)),axis=1)
+
+    behavior,loss_=TimeStreamLayer(sample_num=sample_num,ode_mode=ode_mode,trainable=is_train,loss_lambda=loss_lambda)([timestampEmbed,userEmbed,behaviorEmbed],mask=seq_mask[0])
+
+    behavior=tf.reduce_mean(behavior,axis=1)
+    dnn_input=StackLayer(use_flat=True)([behavior]+sparse_embed)
+    dnn_output=DnnLayer(hidden_units=[64,32])(dnn_input)
+    output=MergeScoreLayer(use_merge=False)(dnn_output)
+
+    model=tf.keras.Model(dense_inputs+sparse_inputs+seq_inputs,output)
+    model.add_loss(loss_)
+
+    return model
 
 
-
-def DSTN(denseInfo:list=None, spareInfo:list=None, seqInfo:list=None):
-    [dense_inputs, spare_inputs, seq_inputs] = prepare_tool.df_prepare(spareInfo=spareInfo, denseInfo=denseInfo,seqInfo=seqInfo)
-    spare_embed = SparseEmbed(spareInfo, use_flatten=False)(spare_inputs)
+def DSTN(denseInfo:list=None, sparseInfo:list=None, seqInfo:list=None):
+    [dense_inputs, sparse_inputs, seq_inputs] = prepare_tool.df_prepare(sparseInfo=sparseInfo, denseInfo=denseInfo,seqInfo=seqInfo)
+    sparse_embed = SparseEmbed(sparseInfo, use_flatten=False)(sparse_inputs)
 
 
 
