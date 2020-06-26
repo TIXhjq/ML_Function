@@ -376,7 +376,7 @@ def SeqFM(denseInfo:list=None, sparseInfo:list=None, seqInfo:list=None,hidden_un
     return tf.keras.Model(dense_inputs+sparse_inputs+seq_inputs,output)
 
 
-def DTSF(denseInfo: list = None, sparseInfo: list = None, seqInfo: list = None,
+def DTS(denseInfo: list = None, sparseInfo: list = None, seqInfo: list = None,
          userFea:list=None,timestampFea:list=None,behaviorFea:list=None,targetFea:list=None,
          ode_mode=1,sample_num=1,is_train=True,loss_lambda:int=0.5):
 
@@ -402,7 +402,6 @@ def DTSF(denseInfo: list = None, sparseInfo: list = None, seqInfo: list = None,
     model.add_loss(loss_)
 
     return model
-
 
 def DSTN(denseInfo:list=None, sparseInfo:list=None, seqInfo:list=None):
     [dense_inputs, sparse_inputs, seq_inputs] = prepare_tool.df_prepare(sparseInfo=sparseInfo, denseInfo=denseInfo,seqInfo=seqInfo)

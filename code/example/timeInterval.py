@@ -75,7 +75,7 @@ timestampFea=['click_interval']
 behaviorFea=['click_item']
 targetFea=['vid']
 
-model=DTSF(sparseInfo=sparseInfo,seqInfo=seqInfo,userFea=userFea,
+model=DTS(sparseInfo=sparseInfo,seqInfo=seqInfo,userFea=userFea,
            timestampFea=timestampFea,behaviorFea=behaviorFea,targetFea=targetFea)
 print(model.summary())
 model.compile(loss="mean_squared_error",optimizer='adam',metrics=['accuracy'])
