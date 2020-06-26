@@ -101,19 +101,26 @@ class IPnnLayer(tf.keras.layers.Layer):
         return inner_list
 
 class ExtractLayer(tf.keras.layers.Layer):
-    def __init__(self,need_fea,need_inputs,supports_masking=True,mask_zero=False):
+    def __init__(self,need_fea,need_inputs,supports_masking=True,mask_zero=False,need_remove=False):
         super(ExtractLayer, self).__init__()
         self.need_fea=need_fea
         self.need_inputs=need_inputs
         self.supports_masking=supports_masking
         self.mask_zero=mask_zero
+        self.need_remove=need_remove
 
     def build(self, input_shape):
         super(ExtractLayer, self).build(input_shape)
 
     def call(self, inputs, **kwargs):
         self.need_idx=[idx_ for idx_,input_ in enumerate(self.need_inputs) if input_.name[:-2] in self.need_fea]
-        return [inputs[idx_] for idx_ in self.need_idx]
+        need_inputs=[inputs[idx_] for idx_ in self.need_idx]
+        if not self.need_remove:
+            return need_inputs
+        else:
+            format_inputs=[i for idx_,i in enumerate(inputs) if idx_ not in self.need_idx]
+            return need_inputs,format_inputs
+
 
     def compute_mask(self,inputs,mask=None):
         if not self.mask_zero:

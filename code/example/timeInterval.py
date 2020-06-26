@@ -73,13 +73,13 @@ train_df,test_df,y_train,y_test=data_pre.extract_train_test(
 userFea=['region']
 timestampFea=['click_interval']
 behaviorFea=['click_item']
+targetFea=['vid']
 
 model=DTSF(sparseInfo=sparseInfo,seqInfo=seqInfo,userFea=userFea,
-           timestampFea=timestampFea,behaviorFea=behaviorFea)
+           timestampFea=timestampFea,behaviorFea=behaviorFea,targetFea=targetFea)
 print(model.summary())
 model.compile(loss="mean_squared_error",optimizer='adam',metrics=['accuracy'])
 
-from tensorflow.keras.callbacks import TensorBoard,ModelCheckpoint,EarlyStopping
-
+from tensorflow.keras.callbacks import EarlyStopping
 model.fit(train_df,y_train,validation_data=(test_df,y_test),epochs=100,
           callbacks=[EarlyStopping(patience=10,verbose=5)])

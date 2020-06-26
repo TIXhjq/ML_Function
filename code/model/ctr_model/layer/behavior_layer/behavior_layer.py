@@ -533,7 +533,7 @@ class LatentTimeStreamLayer(tf.keras.layers.Layer):
         DST core:
             cell ode
     '''
-    def __init__(self,ode_mode,seed=2020,supports_masking=True):
+    def __init__(self,ode_mode,seed=2020,supports_masking=True,trainable=True):
         '''
         :param cell_steps:cell num
         :param ode_mode:
@@ -544,6 +544,7 @@ class LatentTimeStreamLayer(tf.keras.layers.Layer):
         self.ode_mode=ode_mode
         self.seed=seed
         self.supports_masking=supports_masking
+        self.trainable=trainable
 
     def build(self, input_shape):
         super(LatentTimeStreamLayer, self).build(input_shape)
@@ -580,29 +581,33 @@ class LatentTimeStreamLayer(tf.keras.layers.Layer):
 
 
 class TimeDecodedLayer(tf.keras.layers.Layer):
-    def __init__(self,sample_num=1,seed=2020,loss_lambda=0.5,supports_masking=True):
+    def __init__(self,sample_num=1,seed=2020,loss_lambda=0.5,supports_masking=True,trainable=True):
         super(TimeDecodedLayer, self).__init__()
-        self.guideLoss = GuideLossLayer(sample_num=sample_num,loss_lambda=loss_lambda)
+        self.guideLoss = GuideLossLayer(sample_num=sample_num,loss_lambda=loss_lambda,trainable=trainable)
         self.seed=seed
         self.supports_masking=supports_masking
+        self.trainable=trainable
 
     def build(self, input_shape):
         super(TimeDecodedLayer, self).build(input_shape)
         self.hidden_w=self.add_weight(
-            name='hidden_transform',shape=(input_shape[1][-1],input_shape[0][-1]),
+            name='hidden_transform',shape=(input_shape[1][-1],input_shape[0][0][-1]),
             initializer=glorot_uniform(seed=self.seed)
         )
 
     def call(self, inputs, mask=None, **kwargs):
-        [behavior,hidden]=inputs
+        [behavior_list,hidden]=inputs
         hiddenT=tf.tensordot(hidden,self.hidden_w,axes=1)
-        loss_=self.guideLoss([behavior,hiddenT],mask=mask)
-        behavior=behavior+hiddenT
+        loss_=self.guideLoss([behavior_list[0],hiddenT],mask=mask)
 
-        return behavior,loss_
+        behavior_list[0] = behavior_list[0] + hiddenT[:, :behavior_list[0].shape[1], :]
+        if self.trainable==False:
+            behavior_list[1]=behavior_list[1]+hiddenT[:,behavior_list[0].shape[1]:,:]
+
+        return behavior_list,loss_
 
 class GuideLossLayer(tf.keras.layers.Layer):
-    def __init__(self,sample_num=5,hidden_units=[8,8],loss_lambda=0.5,supports_masking=True):
+    def __init__(self,sample_num=5,hidden_units=[8,8],loss_lambda=0.5,supports_masking=True,trainable=True):
 
         super(GuideLossLayer, self).__init__()
         self.sample_= SampleLayer(sample_num=sample_num)
@@ -610,6 +615,7 @@ class GuideLossLayer(tf.keras.layers.Layer):
         self.loss_lambda=loss_lambda
         self.dot=tf.keras.layers.Dot(axes=-1)
         self.supports_masking=supports_masking
+        self.trainable=trainable
 
 
     def build(self, input_shape):
@@ -636,8 +642,8 @@ class GuideLossLayer(tf.keras.layers.Layer):
 class TimeStreamLayer(tf.keras.layers.Layer):
     def __init__(self,ode_mode,sample_num=1,seed=2020,loss_lambda=0.5,trainable=True,supports_masking=True):
         super(TimeStreamLayer, self).__init__()
-        self.lts=LatentTimeStreamLayer(ode_mode=ode_mode,seed=seed)
-        self.decode=TimeDecodedLayer(sample_num=sample_num,seed=seed,loss_lambda=loss_lambda)
+        self.lts=LatentTimeStreamLayer(ode_mode=ode_mode,seed=seed,trainable=trainable)
+        self.decode=TimeDecodedLayer(sample_num=sample_num,seed=seed,loss_lambda=loss_lambda,trainable=trainable)
         self.trainable=trainable
         self.supports_masking=supports_masking
 

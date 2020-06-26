@@ -377,8 +377,8 @@ def SeqFM(denseInfo:list=None, sparseInfo:list=None, seqInfo:list=None,hidden_un
 
 
 def DTSF(denseInfo: list = None, sparseInfo: list = None, seqInfo: list = None,
-         userFea:list=None,timestampFea:list=None,behaviorFea:list=None,ode_mode=1,
-         sample_num=1,is_train=True,loss_lambda:int=0.5):
+         userFea:list=None,timestampFea:list=None,behaviorFea:list=None,targetFea:list=None,
+         ode_mode=1,sample_num=1,is_train=True,loss_lambda:int=0.5):
 
     [dense_inputs, sparse_inputs, seq_inputs] = prepare_tool.df_prepare(sparseInfo=sparseInfo, denseInfo=denseInfo,seqInfo=seqInfo)
     sparse_embed = SparseEmbed(sparseInfo, use_flatten=False)(sparse_inputs)
@@ -387,8 +387,11 @@ def DTSF(denseInfo: list = None, sparseInfo: list = None, seqInfo: list = None,
     timestampEmbed = tf.expand_dims(StackLayer(use_flat=False)(ExtractLayer(timestampFea, seq_inputs)(seq_embed)),axis=-1)
     behaviorEmbed = StackLayer(use_flat=False)(ExtractLayer(behaviorFea, seq_inputs)(seq_embed))
     userEmbed = tf.squeeze(StackLayer(use_flat=False)(ExtractLayer(userFea, sparse_inputs)(sparse_embed)),axis=1)
+    targetEmbed,sparse_embed=ExtractLayer(targetFea, sparse_inputs,need_remove=True)(sparse_embed)
+    behaviorEmbed=[behaviorEmbed,targetEmbed]
 
     behavior,loss_=TimeStreamLayer(sample_num=sample_num,ode_mode=ode_mode,trainable=is_train,loss_lambda=loss_lambda)([timestampEmbed,userEmbed,behaviorEmbed],mask=seq_mask[0])
+    behavior,targetItem=behavior[0],behavior[1]
 
     behavior=tf.reduce_mean(behavior,axis=1)
     dnn_input=StackLayer(use_flat=True)([behavior]+sparse_embed)
