@@ -657,3 +657,5 @@ class TimeStreamLayer(tf.keras.layers.Layer):
         behavior,loss_=self.decode([behavior,hidden],mask=mask)
 
         return behavior,loss_
+
+

@@ -4,7 +4,7 @@
 @Date   :19-11-15 上午11:59
 ================================='''
 import logging
-
+from pandarallel import pandarallel
 import gensim
 import matplotlib.pyplot as plt
 from scipy.stats import stats
@@ -41,6 +41,7 @@ pd.set_option('display.max_rows', None)
 pd.set_option('max_colwidth', 100)
 
 print(os.getcwd())
+
 #----------------------------------------------------
 from model.feature_eng.base_model import base_model
 data_folder='../../data/'
@@ -48,7 +49,8 @@ origin_data_folder=data_folder+'origin_data/'
 submit_data_folder=data_folder+'submit/'
 eda_data_folder=data_folder+'eda_data/'
 result_fea_folder=submit_data_folder+'use_feature/'
-
+#----------------------------------------------------
+pandarallel.initialize()
 
 class feature_tool(object):
     def __init__(self,save_folder:str):

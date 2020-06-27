@@ -403,9 +403,34 @@ def DTS(denseInfo: list = None, sparseInfo: list = None, seqInfo: list = None,
 
     return model
 
+
+def BST(denseInfo: list = None, sparseInfo: list = None, seqInfo: list = None,behaviorFea=None,
+        attention_units=8,hidden_units=None,ffn_hidden_unit=8,attention_head=3):
+    if hidden_units is None:
+        hidden_units = [100, 64, 32]
+
+    [dense_inputs, sparse_inputs, seq_inputs] = prepare_tool.df_prepare(sparseInfo=sparseInfo, denseInfo=denseInfo,seqInfo=seqInfo)
+    sparse_embed = SparseEmbed(sparseInfo, use_flatten=False)(sparse_inputs)
+    seq_embed,seq_mask= SparseEmbed(seqInfo, use_flatten=False, is_linear=False,mask_zero=True)(seq_inputs)
+
+    behaviorEmb=StackLayer(use_flat=False,axis=1)(ExtractLayer(behaviorFea,seq_inputs)(seq_embed))
+    transformerFea=[SelfAttentionLayer(attention_dim=attention_units,attention_head_dim=attention_head,ffn_hidden_unit=ffn_hidden_unit)(emb_)
+        for emb_ in tf.split(behaviorEmb,[2]*(behaviorEmb.shape[1]//2),axis=1)]
+
+    dnn_inputs=StackLayer(axis=-1)(sparse_embed+transformerFea)
+    dnn_output=DnnLayer(hidden_units=hidden_units)(dnn_inputs)
+    output=MergeScoreLayer(use_merge=False)(dnn_output)
+
+    return tf.keras.Model(dense_inputs+sparse_inputs+seq_inputs,output)
+
+
 def DSTN(denseInfo:list=None, sparseInfo:list=None, seqInfo:list=None):
     [dense_inputs, sparse_inputs, seq_inputs] = prepare_tool.df_prepare(sparseInfo=sparseInfo, denseInfo=denseInfo,seqInfo=seqInfo)
     sparse_embed = SparseEmbed(sparseInfo, use_flatten=False)(sparse_inputs)
+
+
+
+
 
 
 
