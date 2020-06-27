@@ -27,7 +27,7 @@ CTR MODEL ACHIEVE:
 >[3]目前计划:  
 >>1.[[MIMN]Practice on Long Sequential User Behavior Modeling for Click-Through Rate Prediction[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BMIMN%5DPractice%20on%20Long%20Sequential%20User%20Behavior%20Modeling%20for%20Click-Through%20Rate%20Prediction%5B2019%5D.pdf)  
 >><building>2.[[DSTN]Deep Spatio-Temporal Neural Networks for Click-Through Rate Prediction[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BDSTN%5DDeep%20Spatio-Temporal%20Neural%20Networks%20for%20Click-Through%20Rate%20Prediction%5B2019%5D.pdf)  
->>3.[[FiBiNET]Combining Feature Importance and Bilinear featureInteraction for Click-Through Rate Predict[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/Next%20Read/%5BFiBiNET%5DCombining%20Feature%20Importance%20and%20Bilinear%20featureInteraction%20for%20Click-Through%20Rate%20Predict%5B2019%5D.pdf)
+>>3.[[FiBiNET]Combining Feature Importance and Bilinear featureInteraction for Click-Through Rate Predict[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/Next%20Read/%5BFiBiNET%5DCombining%20Feature%20Importance%20and%20Bilinear%20featureInteraction%20for%20Click-Through%20Rate%20Predict%5B2019%5D.pdf)  
 >>......  
 
     p.s  
