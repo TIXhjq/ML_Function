@@ -2,6 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/backend/MIMN" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/backend/neural-turing-machine" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/backend/neural-turing-machines" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/backend/ntm_keras" vcs="Git" />
