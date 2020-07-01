@@ -1,6 +1,5 @@
 # _*_ coding:utf-8 _*_
 from gensim.models import Word2Vec
-from deepctr.models import deepfm
 
 class language_model():
     def __init__(self,window_size,dimension_size,work):

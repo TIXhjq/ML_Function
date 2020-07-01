@@ -659,3 +659,152 @@ class TimeStreamLayer(tf.keras.layers.Layer):
         return behavior,loss_
 
 
+class ReadLayer(tf.keras.layers.Layer):
+    def __init__(self,addressCal,read_head=3):
+        super(ReadLayer, self).__init__()
+        self.address = addressCal
+        self.read_head=read_head
+
+    def build(self, input_shape):
+        super(ReadLayer, self).build(input_shape)
+
+    def call(self, inputs, **kwargs):
+        [pre_w,M,read_head]=inputs
+        w=self.address([pre_w,M,read_head])
+
+        return tf.tensordot(w,M,axes=1),w
+
+
+class WriteLayer(tf.keras.layers.Layer):
+    def __init__(self,addressCal,write_head=3,seed=2020):
+        super(WriteLayer, self).__init__()
+        self.address = addressCal
+        self.write_head=write_head
+        self.seed=seed
+
+    def build(self, input_shape):
+        super(WriteLayer, self).build(input_shape)
+        self.erase=self.add_weight(
+            name='erase',shape=(),
+            initializer=glorot_uniform(self.seed)
+        )
+        self.add=self.add_weight(
+            name='add',shape=(),
+            initializer=glorot_uniform(self.seed)
+        )
+
+    def call(self, inputs, **kwargs):
+        [pre_w,pre_M,write_head]=inputs
+        w=self.address([pre_w,M,write_head])
+        M_=pre_M*(1-w*self.erase)
+        M=M_+w*self.add
+
+        return M,w
+
+class AddressCalLayer(tf.keras.layers.Layer):
+
+    def __init__(self,seed=2020):
+        super(AddressCalLayer, self).__init__()
+        self.seed=seed
+
+    def build(self, input_shape):
+        super(AddressCalLayer, self).build(input_shape)
+        [pre_w, M, k] = input_shape
+        self.beta=self.add_weight(
+            name='beta',shape=(k[0],M[0]),
+            initializer=glorot_uniform(seed=self.seed)
+        )
+        self.g=self.add_weight(
+            name='g',shape=(k[0],M[0]),
+            initializer=glorot_uniform(seed=self.seed)
+        )
+        # self.s=self.add_weight(
+        #     name='s',shape=(),
+        #     initializer=glorot_uniform(seed=self.seed)
+        # )
+        # self.gamma=self.add_weight(
+        #     name='gamma',shape=(),
+        #     initializer=glorot_uniform(seed=self.seed)
+        # )
+
+    def call(self, inputs, **kwargs):
+        [pre_w,M,k]=inputs
+        #M=k:[mult_head,slots,bits]
+        M=tf.concat([tf.expand_dims(M,axis=0)for i in range(k.shape[0])],axis=0)
+        k=tf.concat([tf.expand_dims(k,axis=1)for i in range(M.shape[1])],axis=1)
+        content=tf.math.softmax(self.beta*tf.keras.losses.cosine_similarity(k,M))
+        interpolation=self.g*content+(1-self.g)*pre_w
+        w=interpolation
+        # convolutional=tf.reduce_sum()
+        # w=tf.reduce_mean(convolutional)
+
+        return w
+
+
+class ControllerLayer(tf.keras.layers.Layer):
+    def __init__(self,controllerCore,seed=2020):
+        super(ControllerLayer, self).__init__()
+        self.controller = controllerCore
+        self.seed=seed
+
+    def build(self, input_shape):
+        super(ControllerLayer, self).build(input_shape)
+        [output, read_head]=input_shape
+        self.o_shape,self.head_shape=output[-1],(read_head[0] + read_head[1]) * 2
+        self.format_w=self.add_weight(
+            name='format_weight',shape=(output[-1],(read_head[0]+read_head[1])*2),
+            initializer=glorot_uniform(seed=self.seed)
+        )
+
+    def call(self, inputs, **kwargs):
+        controller=self.controller(tf.concat(inputs))
+
+        return tf.split(controller,[self.o_shape,self.head_shape,self.head_shape])
+
+class NTMLayer(tf.keras.layers.Layer):
+    def __init__(self,memory_slots=128,memory_bits=20,mult_head=3,seed=2020,supports_masking=True,
+                 addressCal=AddressCalLayer(seed=2020),controller_network=tf.keras.layers.GRU(units=128)):
+        super(NTMLayer, self).__init__()
+        self.controller=controller_network
+        self.read_op=ReadLayer(addressCal=addressCal)
+        self.write_op=WriteLayer(addressCal=addressCal)
+        self.memory_slots=memory_slots
+        self.memory_bits=memory_bits
+        self.memory_head=mult_head
+        self.seed=seed
+        self.supports_masking=supports_masking
+
+    def build(self, input_shape):
+        super(NTMLayer, self).build(input_shape)
+        self.M=self.add_weight(
+            name='memory',shape=(self.memory_slots,self.memory_bits),
+            initializer=glorot_uniform(seed=self.seed)
+        )
+        self.init_read=self.add_weight(
+            name='init_read',shape=(self.memory_head,self.memory_bits),
+            initializer=glorot_uniform(seed=self.seed)
+        )
+        self.init_readW=self.add_weight(
+            name='read_weight',shape=(self.memory_head,self.memory_slots),
+            initializer=glorot_uniform(seed=self.seed)
+        )
+        self.init_writeW=self.add_weight(
+            name='write_weight', shape=(self.memory_head,self.memory_slots),
+            initializer=glorot_uniform(seed=self.seed)
+        )
+
+    def call(self, inputs, mask=None, **kwargs):
+        def step(inputs, states):
+            [M,pre_read,pre_readW,pre_writeW]=states
+            read_input,readW=self.read_op([pre_readW,M,pre_read])
+            inputs=tf.expand_dims(inputs,axis=1)
+            # control_inputs=tf.concat([inputs,read_input],axis=1)
+            print(self.controller(inputs))
+            output,read_head,write_head=self.controller(inputs)
+            M,writeW=self.write_op([pre_writeW,M,write_head])
+
+            return output, [M,write_head,readW,writeW]
+
+        outputs = tf.keras.backend.rnn(step, inputs, [self.M,self.init_read,self.init_readW,self.init_writeW], mask=mask)
+
+        return outputs

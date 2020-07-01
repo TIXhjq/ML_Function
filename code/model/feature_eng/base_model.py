@@ -24,7 +24,6 @@ import gc
 import re
 import datetime
 import sys
-from deepctr.models import deepfm
 
 warnings.filterwarnings("ignore")
 

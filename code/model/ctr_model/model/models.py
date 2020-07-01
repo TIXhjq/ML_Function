@@ -423,17 +423,13 @@ def BST(denseInfo: list = None, sparseInfo: list = None, seqInfo: list = None,be
 
     return tf.keras.Model(dense_inputs+sparse_inputs+seq_inputs,output)
 
+def NTM_(denseInfo:list=None,sparseInfo:list=None,seqInfo:list=None):
+    [dense_inputs, sparse_inputs, seq_inputs] = prepare_tool.df_prepare(sparseInfo=sparseInfo, denseInfo=denseInfo,seqInfo=seqInfo)
+    sparse_embed = SparseEmbed(sparseInfo, use_flatten=False)(sparse_inputs)
+    seq_embed=SparseEmbed(seqInfo,use_flatten=False)(seq_inputs)[0]
+    print(NTMLayer()(seq_embed))
+
 
 def DSTN(denseInfo:list=None, sparseInfo:list=None, seqInfo:list=None):
     [dense_inputs, sparse_inputs, seq_inputs] = prepare_tool.df_prepare(sparseInfo=sparseInfo, denseInfo=denseInfo,seqInfo=seqInfo)
     sparse_embed = SparseEmbed(sparseInfo, use_flatten=False)(sparse_inputs)
-
-
-
-
-
-
-
-
-
-    
