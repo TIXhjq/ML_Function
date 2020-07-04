@@ -1,4 +1,4 @@
-![image](https://img.shields.io/badge/achieve_build-16-orange)
+![image](https://img.shields.io/badge/achieve_build-17-orange)
 
 
 CTR MODEL ACHIEVE:  
@@ -22,13 +22,13 @@ CTR MODEL ACHIEVE:
 >>4.[[SeqFM]Sequence-Aware Factorization Machines(2019).pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BSeqFM%5DSequence-Aware%20Factorization%20Machines(2019).pdf)  
 >>5.[[DTS]Deep Time-Stream Framework for Click-Through Rate Prediction by Tracking Interest Evolution[2020].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BDTSF%5DDeep%20Time-Stream%20Framework%20for%20Click-Through%20Rate%20Prediction%20by%20Tracking%20Interest%20Evolution%5B2020%5D.pdf)  
 >>6.[[BST]Behavior Sequence Transformer for E-commerce Recommendation in Alibaba[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BBST%5DBehavior%20Sequence%20Transformer%20for%20E-commerce%20Recommendation%20in%20Alibaba%5B2019%5D.pdf)  
+>>7.[[MIMN]Practice on Long Sequential User Behavior Modeling for Click-Through Rate Prediction[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BMIMN%5DPractice%20on%20Long%20Sequential%20User%20Behavior%20Modeling%20for%20Click-Through%20Rate%20Prediction%5B2019%5D.pdf)    
 >>...Later Building...  
     
 >[3]Next Building  
->>1.[building][[MIMN]Practice on Long Sequential User Behavior Modeling for Click-Through Rate Prediction[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BMIMN%5DPractice%20on%20Long%20Sequential%20User%20Behavior%20Modeling%20for%20Click-Through%20Rate%20Prediction%5B2019%5D.pdf)  
->>2.[reading][[LSM]Lifelong Sequential Modeling with Personalized Memorization for User Response Prediction[2019].pdf]()  
->>3.[building][[DSTN]Deep Spatio-Temporal Neural Networks for Click-Through Rate Prediction[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BDSTN%5DDeep%20Spatio-Temporal%20Neural%20Networks%20for%20Click-Through%20Rate%20Prediction%5B2019%5D.pdf)  
->>4.[reading][[FiBiNET]Combining Feature Importance and Bilinear featureInteraction for Click-Through Rate Predict[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/Next%20Read/%5BFiBiNET%5DCombining%20Feature%20Importance%20and%20Bilinear%20featureInteraction%20for%20Click-Through%20Rate%20Predict%5B2019%5D.pdf)  
+>>1.[reading][[LSM]Lifelong Sequential Modeling with Personalized Memorization for User Response Prediction[2019].pdf]()  
+>>2.[building][[DSTN]Deep Spatio-Temporal Neural Networks for Click-Through Rate Prediction[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BDSTN%5DDeep%20Spatio-Temporal%20Neural%20Networks%20for%20Click-Through%20Rate%20Prediction%5B2019%5D.pdf)  
+>>3.[reading][[FiBiNET]Combining Feature Importance and Bilinear featureInteraction for Click-Through Rate Predict[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/Next%20Read/%5BFiBiNET%5DCombining%20Feature%20Importance%20and%20Bilinear%20featureInteraction%20for%20Click-Through%20Rate%20Predict%5B2019%5D.pdf)  
 >>......  
 
     p.s  

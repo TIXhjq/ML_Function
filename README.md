@@ -8,7 +8,14 @@
 
 
 
-  [code](https://github.com/TIXhjq/CTR_Function/tree/master/code)=[nn,feature_eng]  
+>[code folder](https://github.com/TIXhjq/CTR_Function/tree/master/code)=[nn,feature_eng]
+  
+>1.Relatively clear  
+>>[CTR](https://github.com/TIXhjq/CTR_Function/tree/master/code/model/ctr_model)
+  
+>2.confusion part  
+>>[Graph](need to Reconstruction)  
+>>[Feature Enginner](need to Reconstruction)  
   [paper](https://github.com/TIXhjq/CTR_Function/tree/master/paper)=[nn(目前只有CTR部分,剩下的下次一定^_^)]  
   [data](https://github.com/TIXhjq/CTR_Function/tree/master/data)=[nn test sample data]  
   
