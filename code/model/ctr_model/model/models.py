@@ -423,12 +423,39 @@ def BST(denseInfo: list = None, sparseInfo: list = None, seqInfo: list = None,be
 
     return tf.keras.Model(dense_inputs+sparse_inputs+seq_inputs,output)
 
-def NTM_(denseInfo:list=None,sparseInfo:list=None,seqInfo:list=None):
+def MIMN(denseInfo:list=None,sparseInfo:list=None,seqInfo:list=None,behaviorFea=None,candidateFea=None,
+         controller_hidden_units=None,attention_hidden=None,classify_hidden=None,channel_dim=20,memory_slots=128,
+         memory_bits=20, mult_head=3,use_miu=True):
+    '''
+        Warning!!! MIMN need set static batchSize==>please train.py date_prepare(batch_size=?),
+        not support dynamic batchSize!!!
+    '''
+    if not controller_hidden_units:
+        controller_hidden_units=[128,64]
+    if not attention_hidden:
+        attention_hidden = [128, 64]
+    if not classify_hidden:
+        classify_hidden = [128, 64]
+
     [dense_inputs, sparse_inputs, seq_inputs] = prepare_tool.df_prepare(sparseInfo=sparseInfo, denseInfo=denseInfo,seqInfo=seqInfo)
     sparse_embed = SparseEmbed(sparseInfo, use_flatten=False)(sparse_inputs)
-    seq_embed=SparseEmbed(seqInfo,use_flatten=False)(seq_inputs)[0]
-    print(NTMLayer()(seq_embed))
+    seq_embed, seq_mask = SparseEmbed(seqInfo, use_flatten=False, is_linear=False, mask_zero=True)(seq_inputs)
+    seq_embed=StackLayer(use_flat=False)(ExtractLayer(need_fea=behaviorFea,need_inputs=seq_inputs)(seq_embed))
+    target_embed=StackLayer(use_flat=False)(ExtractLayer(need_fea=candidateFea,need_inputs=sparse_inputs,need_remove=False)(sparse_embed))
 
+    [M, pre_read, pre_readW, S]=UICLayer(controller_network=DnnLayer(hidden_units=controller_hidden_units),
+                                         controller_input_flat=True, channel_dim=channel_dim,memory_slots=memory_slots,
+                                         memory_bits=memory_bits, mult_head=mult_head, use_miu=use_miu)(seq_embed)
+    sFea=ActivationUnitLayer(hidden_units=attention_hidden,need_stack=False)([target_embed, S])
+    read_input, readW = ReadLayer(addressCal=AddressCalLayer())([pre_readW, M, pre_read])
+    mFea=ControlWrapLayer(controller_network=DnnLayer(controller_hidden_units)
+                          ,controller_input_flat=True)([tf.squeeze(target_embed,axis=1), read_input, pre_read])[1]
+
+    dnn_inputs=StackLayer(use_flat=True)([sFea,mFea]+sparse_embed)
+    dnn_output=DnnLayer(hidden_units=classify_hidden)(dnn_inputs)
+    output=MergeScoreLayer(use_merge=False)(dnn_output)
+
+    return tf.keras.Model(dense_inputs+sparse_inputs+seq_inputs,output)
 
 def DSTN(denseInfo:list=None, sparseInfo:list=None, seqInfo:list=None):
     [dense_inputs, sparse_inputs, seq_inputs] = prepare_tool.df_prepare(sparseInfo=sparseInfo, denseInfo=denseInfo,seqInfo=seqInfo)

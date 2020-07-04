@@ -104,9 +104,23 @@ def run():
     test_df.to_csv(origin_data_folder + 'gsp_test.csv', index=None)
 
 if __name__=='__main__':
-    max_len=20
-    for _ in range(10):
-        length = np.random.randint(1, max_len + 1)
-        seq = np.random.randint(2, size=length)
+    t = tf.constant([[[1, 1, 1], [2, 2, 2]],
+                     [[3, 3, 3], [4, 4, 4]],
+                     [[5, 5, 5], [6, 6, 6]]],dtype='float32')
+    print(t)
+    _t = tf.constant([[1,2],
+                     [3,2],
+                     [5,3]])
 
 
+    slot=[tf.squeeze(i,axis=0) for i in tf.split(_t,[1]*_t.shape[0],axis=0)]
+    idx_list=tf.concat([tf.expand_dims(
+        tf.math.top_k(i,k=1)[1],axis=0) for idx_,i in enumerate(slot)],axis=0)
+
+
+    idx_=tf.expand_dims(tf.reduce_sum(tf.one_hot(idx_list,depth=2),axis=1),axis=-1)
+    print(idx_)
+    print(tf.tile(idx_,[1,1,3]))
+    print(t*idx_)
+
+    print(idx_list)

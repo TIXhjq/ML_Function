@@ -74,6 +74,8 @@ class StackLayer(tf.keras.layers.Layer):
             return inputs[0]
         else:
             return self.concat(inputs)
+
+
 class ScoreLayer(tf.keras.layers.Layer):
     def __init__(self,use_add=False,use_inner=False,use_global=False,seed=2020):
         from model.ctr_model.layer.interactive_layer.interactive_layer import InnerLayer
@@ -255,3 +257,22 @@ class IntraViewPoolingLayer(tf.keras.layers.Layer):
         output=tf.expand_dims(tf.reduce_mean(inputs,axis=1),axis=1)
 
         return output
+
+class AlignLayer(tf.keras.layers.Layer):
+    '''
+        format dim,if [a,b.,.] dim not eq,
+        format to [a,b...] higher dim
+    '''
+    def __init__(self):
+        super(AlignLayer, self).__init__()
+
+    def build(self, input_shape):
+        super(AlignLayer, self).build(input_shape)
+        dim_list=[i[-1] for i in input_shape]
+        max_dim=max(dim_list)
+        self.format_dense=[tf.keras.layers.Dense(
+            units=max_dim) if i<max_dim else None for i in dim_list]
+
+    def call(self, inputs, **kwargs):
+        return [format_(input_) if format_!=None else input_
+            for input_,format_ in zip(inputs,self.format_dense)]

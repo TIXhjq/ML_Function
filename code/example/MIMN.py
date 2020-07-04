@@ -3,7 +3,7 @@
 '''=================================
 @Author :tix_hjq
 @Date   :2020/6/29 上午11:53
-@File   :ntm.py
+@File   :MIMN.py
 @email  :hjq1922451756@gmail.com or 1922451756@qq.com  
 ================================='''
 from sklearn.model_selection import KFold, StratifiedKFold
@@ -48,10 +48,10 @@ fea_data_folder = data_folder + 'fea_data/'
 #-----------------------------------------------------------------
 model_tool = base_model(submit_data_folder)
 fea_tool = feature_tool(fea_data_folder)
-data_pre=data_prepare()
+data_pre=data_prepare(batch_size=10)
 #-----------------------------------------------------------------
-trainDf=pd.read_csv(origin_data_folder+'seq_train.csv',nrows=10)
-testDf=pd.read_csv(origin_data_folder+'seq_test.csv',nrows=1)
+trainDf=pd.read_csv(origin_data_folder+'seq_train.csv',nrows=100)
+testDf=pd.read_csv(origin_data_folder+'seq_test.csv',nrows=10)
 
 sparse_fea=['user_id','item_id','item_cate']
 seq_fea=['buy_list','cate_list']
@@ -76,7 +76,7 @@ from model.ctr_model.model.models import *
 candidateFea=['item_id','item_cate']
 behaviorFea=['buy_list','cate_list']
 
-model=NTM_(sparseInfo=sparseInfo,seqInfo=seqInfo)
+model=MIMN(sparseInfo=sparseInfo,seqInfo=seqInfo,candidateFea=candidateFea,behaviorFea=behaviorFea)
 print(model.summary())
 model.compile(loss="mean_squared_error",optimizer='adam',metrics=['accuracy'])
 model.fit(train_df,y_train,validation_data=(test_df,y_test),epochs=100,callbacks=[tf.keras.callbacks.EarlyStopping(patience=10,verbose=5)])

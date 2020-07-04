@@ -50,11 +50,13 @@ model_tool = base_model(submit_data_folder)
 fea_tool = feature_tool(fea_data_folder)
 #-----------------------------------------------------------------
 class data_prepare(object):
-    def __init__(self,batch_size=None):
+    def __init__(self,batch_size=None,use_shuffle=True):
         print('data prepare is backend')
         self.sparseFea=namedtuple('sparseFea',['fea_name','word_size','input_dim','cross_unit','linear_unit','pre_weight','mask_zero','is_trainable','input_length','sample_num','batch_size'])
         self.denseFea=namedtuple('denseFea',['fea_name','batch_size'])
         self.batch_size=batch_size
+        self.use_shuffle=use_shuffle
+
 
     def concat_test_train(self, train_df: DataFrame, test_df: DataFrame):
         train_idx = train_df.index.tolist()
@@ -319,4 +321,35 @@ class data_prepare(object):
         train_df.update(train_seq)
         test_df.update(test_seq)
 
+        if self.batch_size!=None:
+            train_df=self.static_batch(train_df)
+            test_df=self.static_batch(test_df)
+            y_train=self.static_batch(y_train)
+            y_test=self.static_batch(y_test)
+
         return train_df,test_df,y_train,y_test
+
+    def input_loc(self,df,use_idx:list):
+        '''
+        :param df: format df
+        :param use_idx: use idx,e.g k-flods
+        :return: df[use idx]
+        '''
+        if isinstance(df, dict):
+            return {key: np.array(df[key])[use_idx] for key in df}
+        else:
+            return df[use_idx]
+
+    def static_batch(self,df):
+        if isinstance(df,dict):
+            df_num=np.array(df[list(df.keys())[0]]).shape[0]
+        else:
+            df_num=len(df)
+
+        batch_num = (df_num // self.batch_size) * self.batch_size
+        need_idx = np.random.choice(list(range(df_num)), size=batch_num)
+        if self.use_shuffle:
+            shuffle(need_idx)
+        df = self.input_loc(df, use_idx=need_idx)
+
+        return df

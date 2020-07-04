@@ -115,11 +115,13 @@ class ExtractLayer(tf.keras.layers.Layer):
     def call(self, inputs, **kwargs):
         self.need_idx=[idx_ for idx_,input_ in enumerate(self.need_inputs) if input_.name[:-2] in self.need_fea]
         need_inputs=[inputs[idx_] for idx_ in self.need_idx]
-        if not self.need_remove:
-            return need_inputs
-        else:
+
+        format_inputs=inputs
+        if self.need_remove:
             format_inputs=[i for idx_,i in enumerate(inputs) if idx_ not in self.need_idx]
-            return need_inputs,format_inputs
+            return [need_inputs,format_inputs]
+        else:
+            return need_inputs
 
 
     def compute_mask(self,inputs,mask=None):

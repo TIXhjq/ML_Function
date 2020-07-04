@@ -27,7 +27,7 @@ fea_data_folder = data_folder + 'fea_data/'
 #-----------------------------------------------------------------
 model_tool = base_model(submit_data_folder)
 fea_tool = feature_tool(fea_data_folder)
-data_pre=data_prepare()
+data_pre=data_prepare(batch_size=32)
 #-----------------------------------------------------------------
 trainDf=pd.read_csv(origin_data_folder+'seq_train.csv')
 testDf=pd.read_csv(origin_data_folder+'seq_test.csv')
@@ -50,13 +50,12 @@ sparseDf,sparseInfo=data_pre.sparse_fea_deal(sparseDf)
 train_df,test_df,y_train,y_test=data_pre.extract_train_test(
     targetDf=targetDf,test_idx=test_idx,train_idx=train_idx,sparseDf=sparseDf,seqDf=seqDf)
 
-
 from model.ctr_model.model.models import *
 
 candidateFea=['item_id','item_cate']
 behaviorFea=['buy_list','cate_list']
 
-model=DIEN(sparseInfo=sparseInfo,seqInfo=seqInfo,candidateFea=candidateFea,behaviorFea=behaviorFea)
+model=MIMN(sparseInfo=sparseInfo,seqInfo=seqInfo,candidateFea=candidateFea,behaviorFea=behaviorFea)
 print(model.summary())
 model.compile(loss="mean_squared_error",optimizer='adam',metrics=['accuracy'])
 model.fit(train_df,y_train,validation_data=(test_df,y_test),epochs=100,callbacks=[tf.keras.callbacks.EarlyStopping(patience=10,verbose=5)])
