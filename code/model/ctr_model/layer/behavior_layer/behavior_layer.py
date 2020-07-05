@@ -639,6 +639,10 @@ class GuideLossLayer(tf.keras.layers.Layer):
 
 
 class TimeStreamLayer(tf.keras.layers.Layer):
+    '''
+        DTS timestream Module
+            cover ODE+concat([behavior&dynamic user profile])
+    '''
     def __init__(self,ode_mode,sample_num=1,seed=2020,loss_lambda=0.5,trainable=True,supports_masking=True):
         super(TimeStreamLayer, self).__init__()
         self.lts=LatentTimeStreamLayer(ode_mode=ode_mode,seed=seed,trainable=trainable)
@@ -659,6 +663,9 @@ class TimeStreamLayer(tf.keras.layers.Layer):
 
 
 class ReadLayer(tf.keras.layers.Layer):
+    '''
+        NTM read
+    '''
     def __init__(self,addressCal,read_head=3):
         super(ReadLayer, self).__init__()
         self.address = addressCal
@@ -675,6 +682,9 @@ class ReadLayer(tf.keras.layers.Layer):
 
 
 class WriteLayer(tf.keras.layers.Layer):
+    '''
+        NTM write
+    '''
     def __init__(self,addressCal,write_head=3,seed=2020):
         super(WriteLayer, self).__init__()
         self.address = addressCal
@@ -705,7 +715,9 @@ class WriteLayer(tf.keras.layers.Layer):
 
 
 class AddressCalLayer(tf.keras.layers.Layer):
-
+    '''
+        NTM attention<find address op>
+    '''
     def __init__(self,seed=2020,shift_range=1):
         super(AddressCalLayer, self).__init__()
         self.seed=seed
@@ -746,6 +758,10 @@ class AddressCalLayer(tf.keras.layers.Layer):
 
 
 class ControlWrapLayer(tf.keras.layers.Layer):
+    '''
+        NTM coller WrapLayer,
+            format input&output
+    '''
     def __init__(self,controller_network,controller_input_flat):
         super(ControlWrapLayer, self).__init__()
         self.controller=controller_network
@@ -810,9 +826,9 @@ class UICLayer(tf.keras.layers.Layer):
         p.s if not to use_miu==False:
                 UIC=Naive UIC=NTM
     '''
-    def __init__(self,controller_network,controller_input_flat=True,channel_dim=20,memory_slots=128
-                 ,memory_bits=20,mult_head=3,seed=2020,use_miu=True,supports_masking=True,
-                 addressCal=AddressCalLayer(seed=2020)):
+    def __init__(self,controller_network=None,controller_input_flat=True,channel_dim=20,memory_slots=128
+                 ,memory_bits=20,mult_head=3,seed=2020,use_miu=True,supports_masking=True,return_sequence=False,
+                 addressCal=AddressCalLayer(seed=2020),return_final_output=False,return_hidden=True):
         super(UICLayer, self).__init__()
         self.controller=ControlWrapLayer(controller_network,controller_input_flat)
         self.read_op=ReadLayer(addressCal=addressCal)
@@ -825,6 +841,9 @@ class UICLayer(tf.keras.layers.Layer):
         self.channel_op=MemoryInductionUnitLayer()
         self.channel_dim=channel_dim
         self.use_miu=use_miu
+        self.return_sequence=return_sequence
+        self.return_hidden=return_hidden
+        self.return_final_output=return_final_output
 
     def build(self, input_shape):
         super(UICLayer, self).build(input_shape)
@@ -860,8 +879,21 @@ class UICLayer(tf.keras.layers.Layer):
             M,writeW=self.write_op([pre_writeW,M,write_head])
 
             return output, [M,read_head,readW,writeW,S]
-        outputs = tf.keras.backend.rnn(step, inputs, [self.M,self.init_read,self.init_readW,self.init_writeW,self.S], mask=mask)
 
-        return [self.M,self.init_read,self.init_readW,self.S]
+        output = tf.keras.backend.rnn(step, inputs, [self.M,self.init_read,self.init_readW,self.init_writeW,self.S], mask=mask)
+
+        final_output = []
+        sequence_output=[]
+        final_hidden=[]
+
+        if self.return_final_output:
+            final_output=list(output[0])
+        if self.return_sequence:
+            sequence_output=list(output[1])
+        if self.return_hidden:
+            final_hidden=list(output[2])
+
+        print(final_hidden)
+        return final_output+sequence_output+final_hidden
 
 

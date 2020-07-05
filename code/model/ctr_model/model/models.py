@@ -443,7 +443,7 @@ def MIMN(denseInfo:list=None,sparseInfo:list=None,seqInfo:list=None,behaviorFea=
     seq_embed=StackLayer(use_flat=False)(ExtractLayer(need_fea=behaviorFea,need_inputs=seq_inputs)(seq_embed))
     target_embed=StackLayer(use_flat=False)(ExtractLayer(need_fea=candidateFea,need_inputs=sparse_inputs,need_remove=False)(sparse_embed))
 
-    [M, pre_read, pre_readW, S]=UICLayer(controller_network=DnnLayer(hidden_units=controller_hidden_units),
+    [M,pre_read,pre_readW,_,S]=UICLayer(controller_network=DnnLayer(hidden_units=controller_hidden_units),
                                          controller_input_flat=True, channel_dim=channel_dim,memory_slots=memory_slots,
                                          memory_bits=memory_bits, mult_head=mult_head, use_miu=use_miu)(seq_embed)
     sFea=ActivationUnitLayer(hidden_units=attention_hidden,need_stack=False)([target_embed, S])
