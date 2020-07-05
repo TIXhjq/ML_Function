@@ -91,7 +91,7 @@ class AttentionUnitLayer(tf.keras.layers.Layer):
         [stack_candidate, stack_behavior] = inputs
         [stack_candidate, stack_behavior]=self.format([stack_candidate,stack_behavior])
         stack_candidate = tf.tile(stack_candidate, [1,stack_behavior.shape[1],1])
-        activation_inputs = tf.concat([stack_candidate, stack_candidate - stack_behavior, stack_behavior],axis=-1)
+        activation_inputs = tf.concat([stack_candidate, stack_candidate - stack_behavior , stack_candidate * stack_behavior, stack_behavior],axis=-1)
         attention_weight = self.dnn(activation_inputs)
         attention_weight = tf.cast(attention_weight, tf.float32)
         if mask!=None:

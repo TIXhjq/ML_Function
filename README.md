@@ -6,7 +6,7 @@
 ![image](https://img.shields.io/badge/pandas-v0.25.0-darkgreen)
 ![image](https://img.shields.io/badge/License-Apache_2.0-blue)
 
-
+Email:hjq1922451756@gmail.com
 
 >1.[code folder](https://github.com/TIXhjq/CTR_Function/tree/master/code)=[nn,feature_eng]
 > 
