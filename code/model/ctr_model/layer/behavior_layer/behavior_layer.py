@@ -818,6 +818,49 @@ class MemoryInductionUnitLayer(tf.keras.layers.Layer):
 
         return S
 
+class RegLossLayer(tf.keras.layers.Layer):
+    def __init__(self,reg_lambda):
+        super(RegLossLayer, self).__init__()
+        self.reg_lambda = reg_lambda
+
+    def build(self, input_shape):
+        super(RegLossLayer, self).build(input_shape)
+
+    def call(self, inputs, **kwargs):
+        mean_slot=tf.expand_dims(tf.reduce_mean(inputs,axis=-1),axis=-1)
+        res_slot=inputs-tf.tile(mean_slot,[1,1,inputs.shape[-1]])
+        res_slot=tf.multiply(res_slot,res_slot)
+        reg_loss=self.reg_lambda*tf.losses.mean_squared_error(res_slot,res_slot)
+
+        return reg_loss
+
+
+class MemoryUtilizationRegLayer(tf.keras.layers.Layer):
+    '''
+        MIMN reduce hot-item write Method
+    '''
+    def __init__(self,reg_lambda=0.3,seed=2020):
+        super(MemoryUtilizationRegLayer, self).__init__()
+        self.reg_loss=RegLossLayer(reg_lambda)
+        self.seed=seed
+
+    def build(self, input_shape):
+        super(MemoryUtilizationRegLayer, self).build(input_shape)
+        [his_w, writeW] = input_shape
+        self.Wg=self.add_weight(
+            name='Wg',shape=writeW,
+            initializer=glorot_uniform(seed=self.seed)
+        )
+
+    def call(self, inputs, **kwargs):
+        [his_w, writeW]=inputs
+        Pt=tf.math.softmax(self.Wg*his_w)
+        reBalanceW=writeW*Pt
+        loss=self.reg_loss(reBalanceW)
+
+        return [reBalanceW,loss]
+
+
 class UICLayer(tf.keras.layers.Layer):
     '''
         base struct:NTM
@@ -826,9 +869,11 @@ class UICLayer(tf.keras.layers.Layer):
         p.s if not to use_miu==False:
                 UIC=Naive UIC=NTM
     '''
-    def __init__(self,controller_network=None,controller_input_flat=True,channel_dim=20,memory_slots=128
-                 ,memory_bits=20,mult_head=3,seed=2020,use_miu=True,supports_masking=True,return_sequence=False,
-                 addressCal=AddressCalLayer(seed=2020),return_final_output=False,return_hidden=True):
+    def __init__(self,controller_network=None,controller_input_flat=True,channel_dim=20,
+                 memory_slots=128,memory_bits=20,mult_head=3,seed=2020,use_miu=True,
+                 supports_masking=True,addressCal=AddressCalLayer(seed=2020),
+                 use_memory_utilization_regularization=True, reg_lambda=0.3,
+                 return_final_output=False,return_hidden=False,return_sequence=False):
         super(UICLayer, self).__init__()
         self.controller=ControlWrapLayer(controller_network,controller_input_flat)
         self.read_op=ReadLayer(addressCal=addressCal)
@@ -844,6 +889,9 @@ class UICLayer(tf.keras.layers.Layer):
         self.return_sequence=return_sequence
         self.return_hidden=return_hidden
         self.return_final_output=return_final_output
+        self.use_reg=use_memory_utilization_regularization
+        if use_memory_utilization_regularization:
+            self.reg_method=MemoryUtilizationRegLayer(reg_lambda=reg_lambda)
 
     def build(self, input_shape):
         super(UICLayer, self).build(input_shape)
@@ -868,19 +916,29 @@ class UICLayer(tf.keras.layers.Layer):
             name='init_S',shape=(bs,self.memory_slots,self.channel_dim),
             initializer=glorot_uniform(self.seed)
         )
+        self.reg_loss = self.add_weight(
+            name='init_loss',shape=(bs,self.memory_head),
+            initializer=tf.keras.initializers.zeros()
+        )
 
 
     def call(self, inputs, mask=None, **kwargs):
         def step(inputs, states):
-            [M,pre_read,pre_readW,pre_writeW,S]=states
+            [M,pre_read,pre_readW,pre_writeW,S,pre_hisW,pre_loss]=states
             read_input,readW=self.read_op([pre_readW,M,pre_read])
             S=self.channel_op([M,readW,inputs,S])
             [output,read_head,write_head]=self.controller([inputs,read_input,pre_read])
             M,writeW=self.write_op([pre_writeW,M,write_head])
+            if self.use_reg:
+                [writeW,loss]=self.reg_method([pre_hisW,writeW])
+                pre_hisW=pre_hisW+writeW
+                loss+=pre_loss
+            else:
+                loss=pre_loss
 
-            return output, [M,read_head,readW,writeW,S]
+            return output, [M,read_head,readW,writeW,S,pre_hisW,loss]
 
-        output = tf.keras.backend.rnn(step, inputs, [self.M,self.init_read,self.init_readW,self.init_writeW,self.S], mask=mask)
+        output = tf.keras.backend.rnn(step, inputs, [self.M,self.init_read,self.init_readW,self.init_writeW,self.S,self.init_writeW,self.reg_loss], mask=mask)
 
         final_output = []
         sequence_output=[]
@@ -892,8 +950,9 @@ class UICLayer(tf.keras.layers.Layer):
             sequence_output=list(output[1])
         if self.return_hidden:
             final_hidden=list(output[2])
+            loss = final_hidden[-1]
+            final_hidden[-1] = tf.reduce_mean(loss) / (inputs.shape[1] - 1)
 
-        print(final_hidden)
         return final_output+sequence_output+final_hidden
 
 

@@ -427,7 +427,7 @@ def MIMN(denseInfo:list=None,sparseInfo:list=None,seqInfo:list=None,behaviorFea=
          controller_hidden_units=None,attention_hidden=None,classify_hidden=None,channel_dim=20,memory_slots=128,
          memory_bits=20, mult_head=3,use_miu=True):
     '''
-        Warning!!! MIMN need set static batchSize==>please train.py date_prepare(batch_size=?),
+        Warning!!! MIMN need set static batchSize==>please set date_prepare(batch_size=?[e.g 32]),
         not support dynamic batchSize!!!
     '''
     if not controller_hidden_units:
@@ -443,9 +443,10 @@ def MIMN(denseInfo:list=None,sparseInfo:list=None,seqInfo:list=None,behaviorFea=
     seq_embed=StackLayer(use_flat=False)(ExtractLayer(need_fea=behaviorFea,need_inputs=seq_inputs)(seq_embed))
     target_embed=StackLayer(use_flat=False)(ExtractLayer(need_fea=candidateFea,need_inputs=sparse_inputs,need_remove=False)(sparse_embed))
 
-    [M,pre_read,pre_readW,_,S]=UICLayer(controller_network=DnnLayer(hidden_units=controller_hidden_units),
+    [M,pre_read,pre_readW,_,S,__,loss]=UICLayer(controller_network=DnnLayer(hidden_units=controller_hidden_units),
                                          controller_input_flat=True, channel_dim=channel_dim,memory_slots=memory_slots,
-                                         memory_bits=memory_bits, mult_head=mult_head, use_miu=use_miu)(seq_embed)
+                                         memory_bits=memory_bits, mult_head=mult_head, use_miu=use_miu,return_hidden=True)(seq_embed)
+    print(loss)
     sFea=ActivationUnitLayer(hidden_units=attention_hidden,need_stack=False)([target_embed, S])
     read_input, readW = ReadLayer(addressCal=AddressCalLayer())([pre_readW, M, pre_read])
     mFea=ControlWrapLayer(controller_network=DnnLayer(controller_hidden_units)
@@ -455,7 +456,10 @@ def MIMN(denseInfo:list=None,sparseInfo:list=None,seqInfo:list=None,behaviorFea=
     dnn_output=DnnLayer(hidden_units=classify_hidden)(dnn_inputs)
     output=MergeScoreLayer(use_merge=False)(dnn_output)
 
-    return tf.keras.Model(dense_inputs+sparse_inputs+seq_inputs,output)
+    model=tf.keras.Model(dense_inputs+sparse_inputs+seq_inputs,output)
+    model.add_loss(loss)
+
+    return model
 
 def DSTN(denseInfo:list=None, sparseInfo:list=None, seqInfo:list=None):
     [dense_inputs, sparse_inputs, seq_inputs] = prepare_tool.df_prepare(sparseInfo=sparseInfo, denseInfo=denseInfo,seqInfo=seqInfo)
