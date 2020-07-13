@@ -29,7 +29,7 @@ CTR MODEL ACHIEVE:
 >>1.[reading][[LSM]Lifelong Sequential Modeling with Personalized Memorization for User Response Prediction[2019].pdf]()  
 >>2.[building][[DSTN]Deep Spatio-Temporal Neural Networks for Click-Through Rate Prediction[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BDSTN%5DDeep%20Spatio-Temporal%20Neural%20Networks%20for%20Click-Through%20Rate%20Prediction%5B2019%5D.pdf)  
 >>3.[reading][[FiBiNET]Combining Feature Importance and Bilinear featureInteraction for Click-Through Rate Predict[2019].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/Next%20Read/%5BFiBiNET%5DCombining%20Feature%20Importance%20and%20Bilinear%20featureInteraction%20for%20Click-Through%20Rate%20Predict%5B2019%5D.pdf)  
->>4.[building][[SIM]Search-based User Interest Modeling with Lifelong Sequential Behavior Data for Click-Through Rate Prediction[2020].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BSIM%5DSearch-based%20User%20Interest%20Modeling%20with%20Lifelong%20Sequential%20Behavior%20Data%20for%20Click-Through%20Rate%20Prediction%5B2020%5D.pdf)    
+>>4.[building][[SIM]Search-based User Interest Modeling with Lifelong Sequential Behavior Data for Click-Through Rate Prediction[2020].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BSIM%5DSearch-based%20User%20Interest%20Modeling%20with%20Lifelong%20Sequential%20Behavior%20Data%20for%20Click-Through%20Rate%20Prediction%5B2020%5D.pdf)      
 >>......  
 
     p.s  
