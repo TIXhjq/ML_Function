@@ -70,6 +70,8 @@ sparseDf,sparseInfo=data_pre.sparse_fea_deal(sparseDf)
 train_df,test_df,y_train,y_test=data_pre.extract_train_test(
     targetDf=targetDf,test_idx=test_idx,train_idx=train_idx,sparseDf=sparseDf,seqDf=seqDf)
 
+fea_tool.count_col()
+
 userFea=['region']
 timestampFea=['click_interval']
 behaviorFea=['click_item']
