@@ -10,10 +10,10 @@ Email:hjq1922451756@gmail.com
 
 >1.[code folder](https://github.com/TIXhjq/CTR_Function/tree/master/code)=[nn,feature_eng]
 > 
->>1)Relatively clear  
+>>1)新鲜,可食用  
 >>>[CTR](https://github.com/TIXhjq/CTR_Function/tree/master/code/model/ctr_model)  
 >
->>2)confusion part  
+>>2)需要重构部分(历史代码)  
 >>>[Graph](need to Reconstruction)  
 >>>[Feature Enginner](need to Reconstruction)  
 >
