@@ -40,4 +40,5 @@ CTR MODEL ACHIEVE:
    
 p.s并不是复现,现在在家没机器,逻辑上应该问题不大,用的部分采样数据,测试模型连通,有问题的话欢迎交流.
 
-[1]()
+
+   [[1][REFORMER] THE EFFICIENT TRANSFORMER[2020].pdf](https://github.com/TIXhjq/CTR_Function/blob/master/paper/behavior/%5BREFORMER%5D%20THE%20EFFICIENT%20TRANSFORMER%5B2020%5D.pdf)
