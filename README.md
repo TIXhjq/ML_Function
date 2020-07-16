@@ -14,8 +14,8 @@ Email:hjq1922451756@gmail.com
 >>>[CTR](https://github.com/TIXhjq/CTR_Function/tree/master/code/model/ctr_model)  
 >
 >>2)需要重构部分(历史代码)  
->>>[Graph](need to Reconstruction)  
->>>[Feature Enginner](need to Reconstruction)  
+>>>[Graph](重构)  
+>>>[Feature Enginner](重构)  
 >
 >2.[paper](https://github.com/TIXhjq/CTR_Function/tree/master/paper)=[nn(目前只有CTR部分,剩下的下次一定^_^)]  
 >3.[data](https://github.com/TIXhjq/CTR_Function/tree/master/data)=[nn test sample data]  
