@@ -7,6 +7,9 @@
 ![image](https://img.shields.io/badge/License-Apache_2.0-blue)  
 Email:hjq1922451756@gmail.com
 
+    食用方式:
+        pip install ML-Function  
+        from kon. ...
 
 >1.[code folder](https://github.com/TIXhjq/CTR_Function/tree/master/code)=[nn,feature_eng]
 > 
@@ -18,7 +21,8 @@ Email:hjq1922451756@gmail.com
 >>>[Feature Enginner(重构)](https://github.com/TIXhjq/CTR_Function/tree/master/code/model/feature_eng)  
 >
 >2.[paper](https://github.com/TIXhjq/CTR_Function/tree/master/paper)=[nn(目前只有CTR部分,剩下的下次一定^_^)]  
->3.[data](https://github.com/TIXhjq/CTR_Function/tree/master/data)=[nn test sample data]  
+>3.[use example](https://github.com/TIXhjq/CTR_Function/tree/master/example)[ctr_example(充足),else(maybe...)]  
+>4.[data](https://github.com/TIXhjq/CTR_Function/tree/master/data)=[nn test sample data]  
   
   p.s 每层目录有对应的详细介绍...
   
