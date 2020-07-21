@@ -8,7 +8,7 @@
 Email:hjq1922451756@gmail.com
 
     食用方式:
-        pip install ML-Function  
+        pip install Data-Function  
         from kon. ...
 
 >1.[code folder](https://github.com/TIXhjq/CTR_Function/tree/master/code)=[nn,feature_eng]
