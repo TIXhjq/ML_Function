@@ -15,24 +15,22 @@ from sklearn.linear_model import PassiveAggressiveClassifier, SGDClassifier, Rid
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import StratifiedKFold
 from sklearn.svm import LinearSVC
-
 from kon.model.embedding.util.util_tool import save_edgelist
 import re
 from kon.model.embedding.model_test import model_test
 from sklearn.preprocessing import LabelEncoder
 from tqdm import tqdm
-# from PIL import Image
 import pandas as pd
 import numpy as np
 import pickle
 import time
 import warnings
 import datetime
-# import cv2
 import os
 import gc
 import seaborn as sns
 from multiprocessing import Pool
+from kon.model.feature_eng.base_model import base_model
 
 warnings.filterwarnings("ignore")
 
@@ -41,17 +39,14 @@ pd.set_option('display.max_rows', None)
 pd.set_option('max_colwidth', 100)
 
 print(os.getcwd())
-
 #----------------------------------------------------
-from kon.model.feature_eng.base_model import base_model
 data_folder='../../data/'
 origin_data_folder=data_folder+'origin_data/'
 submit_data_folder=data_folder+'submit/'
 eda_data_folder=data_folder+'eda_data/'
 result_fea_folder=submit_data_folder+'use_feature/'
-#----------------------------------------------------
 pandarallel.initialize()
-
+#----------------------------------------------------
 class feature_tool(object):
     def __init__(self,save_folder:str):
         print('feature tool is backend')

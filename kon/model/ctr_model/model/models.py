@@ -439,3 +439,5 @@ def MIMN(denseInfo:list=None,sparseInfo:list=None,seqInfo:list=None,behaviorFea=
 def DSTN(denseInfo:list=None, sparseInfo:list=None, seqInfo:list=None):
     [dense_inputs, sparse_inputs, seq_inputs] = prepare_tool.df_prepare(sparseInfo=sparseInfo, denseInfo=denseInfo,seqInfo=seqInfo)
     sparse_embed = SparseEmbed(sparseInfo, use_flatten=False)(sparse_inputs)
+
+

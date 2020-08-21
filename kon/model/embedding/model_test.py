@@ -109,3 +109,5 @@ def model_test(build_name,edgelist_path='wiki/Wiki_edgelist.txt',embedding=8):
 
 if __name__=='__main__':
     model_test('deepwalk')
+
+

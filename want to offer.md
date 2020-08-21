@@ -14,7 +14,7 @@
 12.[Baidu](https://www.nowcoder.com/discuss/477163?type=7&order=3&pos=215&page=1&source_id=discuss_center_7&channel=666)  
 13.[涂鸦](https://www.nowcoder.com/discuss/469857?type=all&order=time&pos=&page=1&channel=666&source_id=search_all)        
 14.[贝壳](http://campus.ke.com/Portal/Apply/Index)  
-5.[小红书]()
+5.[小红书](https://campus.liepin.com/apply/showapplylist/)
 
 未投递
 1.[趋势科技](https://www.nowcoder.com/discuss/477614?type=7&order=3&pos=89&page=1&source_id=discuss_center_7&channel=666)

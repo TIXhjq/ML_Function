@@ -699,6 +699,7 @@ class WriteLayer(tf.keras.layers.Layer):
 class AddressCalLayer(tf.keras.layers.Layer):
     '''
         NTM attention<find address op>
+        not use sharp&filter
     '''
     def __init__(self,seed=2020,shift_range=1):
         super(AddressCalLayer, self).__init__()

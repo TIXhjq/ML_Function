@@ -2,6 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/backend/Huawei-Digix-Algorithm-Contest" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/backend/MIMN" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/backend/mips" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/backend/neural-turing-machine" vcs="Git" />
