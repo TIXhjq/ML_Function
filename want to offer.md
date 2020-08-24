@@ -18,7 +18,7 @@
 >31.[同花顺-笔试时间](http://talent.10jqka.com.cn/default/usercenter/index/)
 >> 笔试(2020/09/05 10:00~12:00)...
 
->12.[Baidu](https://www.nowcoder.com/discuss/477163?type=7&order=3&pos=215&page=1&source_id=discuss_center_7&channel=666)  
+>12.[Baidu](https://talent.baidu.com/external/baidu/campus.html#/individualCenter)  
 >> 面试流程中(感觉在备胎池安排的明明白白)-->
 
 >27.[滴滴]()
