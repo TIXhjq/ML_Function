@@ -44,7 +44,7 @@
 >>10.[小米-9月8日&9月15日](http://campus.hr.xiaomi.com/#/candidateHome/applications)  
 >>23.[网易互娱-9月上旬](https://game.campus.163.com/personal)  
 >>24.[vivo-预计9月12日](https://hr.vivo.com/wt/vivo/web/templet1000/index/corpshowNewDeliveryRecordvivo!listApplyPosition?operational=0f6b1d412a49a6ed4da2313a8b2838d069b8a116cee85e2f0b51e0dc10b09fe4aabb5405b111de6fe0e1ca982d84ec9fbe3222b5e6c18799637da8bba746318b76ec65eeda80517339fe3e53302b1c355102cf9edcb02c0b3a9d29e7db739ecd4c86a2b256822693)      
->>22.[新浪-9.12/13](https://career.sina.com.cn/portal/myapply/?gql=glluemeuser%3D%257B%257Bglluemeuser.id%257D%257D%26record_type__ns%3DInternal%2520Transfer)
+>>22.[新浪-9.12/13](https://career.sina.com.cn/portal/myapply/?gql=glluemeuser%3D%257B%257Bglluemeuser.id%257D%257D%26record_type__ns%3DInternal%2520Transfer)  
 >>29.[去哪了-9月中]()  
 
 >10月    
