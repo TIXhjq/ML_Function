@@ -27,34 +27,41 @@
 >3.[头条](https://job.bytedance.com/campus/position/application?referral_code=P5NGXS4)
 >> 笔试(8.23,这对于我来说好难...前两次的感觉我还稍微比这个会点,感觉要直接感谢了)...
   
---------------------未进入流程--------------------
+--------------------未进入流程--------------------  
+无需笔试--------------
+>9.[猫眼-无需笔试](https://www.nowcoder.com/discuss/462838?type=post&order=create&pos=&page=1&channel=666&source_id=search_post)
 
->2.[斗鱼直播](https://app.mokahr.com/m/candidate/applications/deliver-query/douyu)    
->5.[JD](http://campus.jd.com/web/apply/myjob)  
->6.[跟谁学](nowcoder.com/discuss/468913?type=all&order=time&pos=&page=1&channel=1009&source_id=search_all)  
->9.[猫眼](https://www.nowcoder.com/discuss/462838?type=post&order=create&pos=&page=1&channel=666&source_id=search_post)  
->10.[小米](http://campus.hr.xiaomi.com/#/candidateHome/applications)  
->11.[58](https://www.nowcoder.com/discuss/469622?type=all&order=time&pos=&page=1&channel=666&source_id=search_all)  [58](http://campus.58.com/Portal/Apply/Index)  
->14.[贝壳](http://campus.ke.com/Portal/Apply/Index)  
->15.[小红书](https://campus.liepin.com/apply/showapplylist/)  
->16.[信也](https://app.mokahr.com/campus_apply/paipaidai/6537#/candidateHome/applications)  
->17.[东方财富](https://eastmoney.zhiye.com/Portal/Apply/Index)  
->18.[唯品会](https://recruitment.corp.vipshop.com/wt/VIPS/web/index?brandCode=VIP#/pc)  
->19.[咪钴](https://www.migu.cn/about/join/graduate/resume/preview)  
->20.[作业帮](https://job.zuoyebang.com/xiaoyuan.html#/candidateHome/applications)  
->21.[未投递 一点资讯](hotjob.cn/wt/yidian/web/index/webPosition210!getAboutUs?columnId=1&recruitType=1&brandCode=1&twoColumnId=100504&projectId=)  
->22.[新浪](https://career.sina.com.cn/portal/myapply/?gql=glluemeuser%3D%257B%257Bglluemeuser.id%257D%257D%26record_type__ns%3DInternal%2520Transfer)  
->23.[网易互娱](https://game.campus.163.com/personal)  
->24.[vivo](https://hr.vivo.com/wt/vivo/web/templet1000/index/corpshowNewDeliveryRecordvivo!listApplyPosition?operational=0f6b1d412a49a6ed4da2313a8b2838d069b8a116cee85e2f0b51e0dc10b09fe4aabb5405b111de6fe0e1ca982d84ec9fbe3222b5e6c18799637da8bba746318b76ec65eeda80517339fe3e53302b1c355102cf9edcb02c0b3a9d29e7db739ecd4c86a2b256822693)  
->25.[当当](https://dangdangwang.zhiye.com/Portal/Apply/Index)  
->26.[搜狐]()  
->28.[酷家乐]()    
->29.[去哪了]()  
->30.[途虎养车]()  
->32.[小鹏汽车](https://app.mokahr.com/campus_apply/xiaopeng/22#/candidateHome/applications)  
->33.[当当]()  
+有预计时间笔试---------  
+>8月
+>>5.[JD-2020年8月27日（技术)](http://campus.jd.com/web/apply/myjob)  
+>>26.[搜狐-预计8月29日/30日]()  
+>>25.[当当-牛客上是8.30](https://dangdangwang.zhiye.com/Portal/Apply/Index)  
+>>15.[小红书-2020-08-30-2020-09-06](https://campus.liepin.com/apply/showapplylist/)      
+>>14.[贝壳-8.31](http://campus.ke.com/Portal/Apply/Index)
 
+>9月
+>>11.[58-9.1/7/15/23](https://www.nowcoder.com/discuss/469622?type=all&order=time&pos=&page=1&channel=666&source_id=search_all)  [58](http://campus.58.com/Portal/Apply/Index)    
+>>10.[小米-9月8日&9月15日](http://campus.hr.xiaomi.com/#/candidateHome/applications)  
+>>23.[网易互娱-9月上旬](https://game.campus.163.com/personal)  
+>>24.[vivo-预计9月12日](https://hr.vivo.com/wt/vivo/web/templet1000/index/corpshowNewDeliveryRecordvivo!listApplyPosition?operational=0f6b1d412a49a6ed4da2313a8b2838d069b8a116cee85e2f0b51e0dc10b09fe4aabb5405b111de6fe0e1ca982d84ec9fbe3222b5e6c18799637da8bba746318b76ec65eeda80517339fe3e53302b1c355102cf9edcb02c0b3a9d29e7db739ecd4c86a2b256822693)      
+>>22.[新浪-9.12/13](https://career.sina.com.cn/portal/myapply/?gql=glluemeuser%3D%257B%257Bglluemeuser.id%257D%257D%26record_type__ns%3DInternal%2520Transfer)
+>>29.[去哪了-9月中]()  
 
+>10月    
+>>19.[咪钴-???10月???](https://www.migu.cn/about/join/jobs-2-0-0.html)      
+
+无准确消息-----------
+>>20.[作业帮](https://job.zuoyebang.com/xiaoyuan.html#/candidateHome/applications)    
+>>32.[小鹏汽车](https://app.mokahr.com/campus_apply/xiaopeng/22#/candidateHome/applications)  
+>>2.[斗鱼直播](https://app.mokahr.com/m/candidate/applications/deliver-query/douyu)      
+>>6.[跟谁学]()    
+>>16.[信也](https://app.mokahr.com/campus_apply/paipaidai/6537#/candidateHome/applications)  
+>>17.[东方财富](https://eastmoney.zhiye.com/Portal/Apply/Index)  
+>>18.[唯品会](https://recruitment.corp.vipshop.com/wt/VIPS/web/index?brandCode=VIP#/pc)  
+>>21.[未投递 一点资讯](hotjob.cn/wt/yidian/web/index/webPosition210!getAboutUs?columnId=1&recruitType=1&brandCode=1&twoColumnId=100504&projectId=)    
+>>28.[酷家乐]()    
+>>30.[途虎养车]()  
+    
 未投递
 1.[趋势科技](https://www.nowcoder.com/discuss/477614?type=7&order=3&pos=89&page=1&source_id=discuss_center_7&channel=666)
 
