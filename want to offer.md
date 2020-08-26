@@ -6,6 +6,9 @@
 >> 简历挂...
 
 --------------------流程中--------------------
+>12.[Baidu提前批](https://talent.baidu.com/external/baidu/campus.html#/individualCenter)    
+>> 一面ing...  
+
 >1.[bilibili](https://app.mokahr.com/campus_apply/bilibili01/6205#/candidateHome/applications?_k=xefjj3)
 >> 笔试(8.13)-->
 
@@ -14,12 +17,6 @@
 
 >8.[美团](https://campus.meituan.com/apply-record)
 >> 笔试(太差了,估计挂了)...
-
->31.[同花顺-笔试时间](http://talent.10jqka.com.cn/default/usercenter/index/)
->> 笔试(2020/09/05 10:00~12:00)...
-
->12.[Baidu](https://talent.baidu.com/external/baidu/campus.html#/individualCenter)  
->> 面试流程中(感觉在备胎池安排的明明白白)-->
 
 >27.[滴滴]()
 >> 笔试(8.21)-->
@@ -40,7 +37,8 @@
 >>14.[贝壳-8.31](http://campus.ke.com/Portal/Apply/Index)
 
 >9月
->>11.[58-9.1/7/15/23](https://www.nowcoder.com/discuss/469622?type=all&order=time&pos=&page=1&channel=666&source_id=search_all)  [58](http://campus.58.com/Portal/Apply/Index)    
+>>11.[58-9.1/7/15/23](https://www.nowcoder.com/discuss/469622?type=all&order=time&pos=&page=1&channel=666&source_id=search_all)  [58](http://campus.58.com/Portal/Apply/Index)  
+>>31.[同花顺-2020/09/05 10:00~12:00](http://talent.10jqka.com.cn/default/usercenter/index/)     
 >>10.[小米-9月8日&9月15日](http://campus.hr.xiaomi.com/#/candidateHome/applications)  
 >>23.[网易互娱-9月上旬](https://game.campus.163.com/personal)  
 >>24.[vivo-预计9月12日](https://hr.vivo.com/wt/vivo/web/templet1000/index/corpshowNewDeliveryRecordvivo!listApplyPosition?operational=0f6b1d412a49a6ed4da2313a8b2838d069b8a116cee85e2f0b51e0dc10b09fe4aabb5405b111de6fe0e1ca982d84ec9fbe3222b5e6c18799637da8bba746318b76ec65eeda80517339fe3e53302b1c355102cf9edcb02c0b3a9d29e7db739ecd4c86a2b256822693)      
@@ -60,8 +58,9 @@
 >>18.[唯品会](https://recruitment.corp.vipshop.com/wt/VIPS/web/index?brandCode=VIP#/pc)  
 >>21.[未投递 一点资讯](hotjob.cn/wt/yidian/web/index/webPosition210!getAboutUs?columnId=1&recruitType=1&brandCode=1&twoColumnId=100504&projectId=)    
 >>28.[酷家乐]()    
->>30.[途虎养车]()  
-    
+>>30.[途虎养车]()    
+>>31.[依图](https://app.mokahr.com/m/candidate/applications/deliver-query/yitu-inc)  
+     
 未投递
 1.[趋势科技](https://www.nowcoder.com/discuss/477614?type=7&order=3&pos=89&page=1&source_id=discuss_center_7&channel=666)
 
