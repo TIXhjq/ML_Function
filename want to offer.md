@@ -16,28 +16,29 @@
 >> 笔试(8.15)-->
 
 >8.[美团](https://campus.meituan.com/apply-record)
->> 笔试(太差了,估计挂了)...
+>> 笔试(8.16)-->
 
 >27.[滴滴]()
 >> 笔试(8.21)-->
 
 >3.[头条](https://job.bytedance.com/campus/position/application?referral_code=P5NGXS4)
->> 笔试(8.23,这对于我来说好难...前两次的感觉我还稍微比这个会点,感觉要直接感谢了)...
-  
+>> 笔试(8.23)-->评估通过(答的太差被捞了吗？)
+
+>>5.[JD](http://campus.jd.com/web/apply/myjob)  
+>> 笔试(8.27)-->
 --------------------未进入流程--------------------  
 无需笔试--------------
 >9.[猫眼-无需笔试](https://www.nowcoder.com/discuss/462838?type=post&order=create&pos=&page=1&channel=666&source_id=search_post)
 
 有预计时间笔试---------  
 >8月
->>5.[JD-2020年8月27日（技术)](http://campus.jd.com/web/apply/myjob)  
 >>26.[搜狐-预计8月29日/30日]()  
 >>25.[当当-牛客上是8.30](https://dangdangwang.zhiye.com/Portal/Apply/Index)  
 >>15.[小红书-2020-08-30-2020-09-06](https://campus.liepin.com/apply/showapplylist/)      
 >>14.[贝壳-8.31](http://campus.ke.com/Portal/Apply/Index)
+>>11.[58-8.31](https://www.nowcoder.com/discuss/469622?type=all&order=time&pos=&page=1&channel=666&source_id=search_all)  [58](http://campus.58.com/Portal/Apply/Index)
 
 >9月
->>11.[58-9.1/7/15/23](https://www.nowcoder.com/discuss/469622?type=all&order=time&pos=&page=1&channel=666&source_id=search_all)  [58](http://campus.58.com/Portal/Apply/Index)  
 >>31.[同花顺-2020/09/05 10:00~12:00](http://talent.10jqka.com.cn/default/usercenter/index/)     
 >>10.[小米-9月8日&9月15日](http://campus.hr.xiaomi.com/#/candidateHome/applications)  
 >>23.[网易互娱-9月上旬](https://game.campus.163.com/personal)  
@@ -60,6 +61,7 @@
 >>28.[酷家乐]()    
 >>30.[途虎养车]()    
 >>31.[依图](https://app.mokahr.com/m/candidate/applications/deliver-query/yitu-inc)  
+>>32.[同城](http://i.51job.com/userset/my_apply.php?type=xy&lang=c)    
      
 未投递
 1.[趋势科技](https://www.nowcoder.com/discuss/477614?type=7&order=3&pos=89&page=1&source_id=discuss_center_7&channel=666)
