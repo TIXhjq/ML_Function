@@ -7,7 +7,7 @@
 
 --------------------流程中--------------------
 >12.[Baidu提前批](https://talent.baidu.com/external/baidu/campus.html#/individualCenter)      
->> 一面ing...  
+>> 一面挂(没准备...血崩)
 
 >1.[bilibili](https://app.mokahr.com/campus_apply/bilibili01/6205#/candidateHome/applications?_k=xefjj3)  
 >> 笔试(8.13)-->  
@@ -22,10 +22,10 @@
 >> 笔试(8.21)-->    
 
 >3.[头条](https://job.bytedance.com/campus/position/application?referral_code=P5NGXS4)  
->> 笔试(8.23)-->评估通过(答的太差被捞了吗？)  
+>> 笔试(8.23)-->评估通过(8.25)-->约面(8.29)-->一面(9.4)  
 
 >>5.[JD](http://campus.jd.com/web/apply/myjob)    
->> 笔试(8.27)-->  
+>> 笔试(8.27)-->笔试通过(8.30)-->  
 --------------------未进入流程--------------------  
 无需笔试--------------
 >9.[猫眼-无需笔试](https://www.nowcoder.com/discuss/462838?type=post&order=create&pos=&page=1&channel=666&source_id=search_post)
@@ -35,11 +35,11 @@
 >>26.[搜狐-预计8月29日/30日]()  
 >>25.[当当-牛客上是8.30](https://dangdangwang.zhiye.com/Portal/Apply/Index)  
 >>15.[小红书-2020-08-30-2020-09-06](https://campus.liepin.com/apply/showapplylist/)      
->>14.[贝壳-8.31](http://campus.ke.com/Portal/Apply/Index)  
 >>11.[58-8.31](http://campus.58.com/Portal/Apply/Index)  
 
 >9月
->>31.[同花顺-2020/09/05 10:00~12:00](http://talent.10jqka.com.cn/default/usercenter/index/)     
+>>31.[同花顺-2020/09/05 10:00~12:00](http://talent.10jqka.com.cn/default/usercenter/index/)  
+>>14.[贝壳-9.7](http://campus.ke.com/Portal/Apply/Index)       
 >>10.[小米-9月8日&9月15日](http://campus.hr.xiaomi.com/#/candidateHome/applications)  
 >>23.[网易互娱-9月上旬](https://game.campus.163.com/personal)  
 >>24.[vivo-预计9月12日](https://hr.vivo.com/wt/vivo/web/templet1000/index/corpshowNewDeliveryRecordvivo!listApplyPosition?operational=0f6b1d412a49a6ed4da2313a8b2838d069b8a116cee85e2f0b51e0dc10b09fe4aabb5405b111de6fe0e1ca982d84ec9fbe3222b5e6c18799637da8bba746318b76ec65eeda80517339fe3e53302b1c355102cf9edcb02c0b3a9d29e7db739ecd4c86a2b256822693)      
@@ -62,6 +62,7 @@
 >>30.[途虎养车]()    
 >>31.[依图](https://app.mokahr.com/m/candidate/applications/deliver-query/yitu-inc)  
 >>32.[同城](http://i.51job.com/userset/my_apply.php?type=xy&lang=c)    
+>>33.[哈喽单车]()      
      
 未投递
 1.[趋势科技](https://www.nowcoder.com/discuss/477614?type=7&order=3&pos=89&page=1&source_id=discuss_center_7&channel=666)
