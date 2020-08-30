@@ -5,10 +5,10 @@
 >4.[pdd](https://careers.pinduoduo.com/campus/personal-center)
 >> 简历挂...
 
---------------------流程中--------------------
->12.[Baidu提前批](https://talent.baidu.com/external/baidu/campus.html#/individualCenter)      
->> 一面挂(没准备...血崩)
+>>25.[当当-简历挂，或许不知道，流程未结束](https://dangdangwang.zhiye.com/Portal/Apply/Index)  
+>>15.[小红书-简历挂，最迷的一次投递，奇奇怪怪的地方](https://campus.liepin.com/apply/showapplylist/)
 
+--------------------流程中--------------------
 >1.[bilibili](https://app.mokahr.com/campus_apply/bilibili01/6205#/candidateHome/applications?_k=xefjj3)  
 >> 笔试(8.13)-->  
 
@@ -32,12 +32,12 @@
 
 有预计时间笔试---------  
 >8月
->>26.[搜狐-预计8月29日/30日]()  
->>25.[当当-牛客上是8.30](https://dangdangwang.zhiye.com/Portal/Apply/Index)  
->>15.[小红书-2020-08-30-2020-09-06](https://campus.liepin.com/apply/showapplylist/)      
+>>26.[搜狐-预计8月29日/30日]()        
 >>11.[58-8.31](http://campus.58.com/Portal/Apply/Index)  
 
 >9月
+>>12.[Baidu提前批](https://talent.baidu.com/external/baidu/campus.html#/individualCenter)        
+>> 一面挂(没准备...血崩)-->自动转正式批(预计笔试9.3)  
 >>31.[同花顺-2020/09/05 10:00~12:00](http://talent.10jqka.com.cn/default/usercenter/index/)  
 >>14.[贝壳-9.7](http://campus.ke.com/Portal/Apply/Index)       
 >>10.[小米-9月8日&9月15日](http://campus.hr.xiaomi.com/#/candidateHome/applications)  
