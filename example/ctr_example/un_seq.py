@@ -11,7 +11,6 @@ import pandas as pd
 import numpy as np
 import warnings
 import os
-from kon.utils import data_prepare
 from kon.model.ctr_model.model.models import *
 
 warnings.filterwarnings("ignore")
@@ -34,12 +33,15 @@ prepare_tool=data_prepare()
 np.random.seed(2020)
 tf.random.set_seed(2020)
 
-train_df=pd.read_csv(origin_data_folder+'unseq_train.csv').rename(columns={'target':'label'})
-test_df=pd.read_csv(origin_data_folder+'unseq_test.csv').rename(columns={'target':'label'})
+train_df=pd.read_csv(origin_data_folder+'unseq_train.csv',nrows=100).rename(columns={'target':'label'})
+test_df=pd.read_csv(origin_data_folder+'unseq_test.csv',nrows=100).rename(columns={'target':'label'})
 
 sparse_fea=[str(i) for i in range(14,40)]
 dense_fea=[str(i) for i in range(1,14)]
 target_fea=['label']
+
+val_index=np.random.choice(train_df.index.tolist(),size=int(train_df.shape[0]*0.3))
+train_index=[i for i in train_df.index.tolist()if i not in val_index]
 
 df,(train_idx,test_idx)=prepare_tool.concat_test_train(train_df,test_df)
 sparseDf=df[sparse_fea]
@@ -51,10 +53,11 @@ denseDf,denseInfo=prepare_tool.dense_fea_deal(denseDf)
 
 # train_df,test_df,y_train,y_test=prepare_tool.extract_train_test(train_idx=train_idx,test_idx=test_idx,sparseDf=sparseDf,denseDf=denseDf,targetDf=targetDf)
 train_df,test_df,y_train,y_test=prepare_tool.extract_train_test(train_idx=train_idx,test_idx=test_idx,sparseDf=sparseDf,targetDf=targetDf)
-
+train_x,train_y,val_set=prepare_tool.split_val_set(train_df,y_train,train_index,val_index)
 #----------------------------train model--------------------------------------
 
 model=AutoInt(sparseInfo=sparseInfo)
 print(model.summary())
 model.compile(loss="binary_crossentropy",optimizer='adam',metrics=['accuracy'])
-model.fit(train_df,y_train,batch_size=64,validation_data=(test_df,y_test),epochs=100,callbacks=[tf.keras.callbacks.EarlyStopping(patience=10,verbose=5)],shuffle=False)
+model.fit(train_x,train_y,validation_data=val_set,batch_size=64,epochs=100,callbacks=[tf.keras.callbacks.EarlyStopping(patience=10,verbose=5)],shuffle=False)
+model.predict(test_df)

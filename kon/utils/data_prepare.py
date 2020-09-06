@@ -295,12 +295,12 @@ class data_prepare(object):
         except TypeError:
             train_seq,test_seq= {}, {}
 
+        y_train=targetDf.loc[train_idx]
+        y_test=targetDf.loc[test_idx]
         if use_softmax:
-            targetDf=tf.keras.utils.to_categorical(targetDf.values.tolist())
+            y_train=tf.keras.utils.to_categorical(y_train.values.tolist())
         else:
-            targetDf=targetDf.values
-        y_train=targetDf[train_idx]
-        y_test=targetDf[test_idx]
+            y_train=y_train.values
 
         train_df=self.df_format_input([train_dense,train_sparse])
         test_df=self.df_format_input([test_dense,test_sparse])
@@ -339,3 +339,11 @@ class data_prepare(object):
         df = self.input_loc(df, use_idx=need_idx)
 
         return df
+
+    def split_val_set(self,train_df,y_train,train_index,val_index):
+        train_x = self.input_loc(df=train_df, use_idx=train_index)
+        train_y = self.input_loc(df=y_train, use_idx=train_index)
+        val_x = self.input_loc(df=train_df, use_idx=val_index)
+        val_y = self.input_loc(df=y_train, use_idx=val_index)
+
+        return train_x,train_y,(val_x,val_y)

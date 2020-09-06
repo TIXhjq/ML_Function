@@ -241,6 +241,7 @@ class InterestEolvingLayer(tf.keras.layers.Layer):
         if not self.mask_zero:
             return None
         return mask
+    
 
 class PositionalEncodeLayer(tf.keras.layers.Layer):
     '''
