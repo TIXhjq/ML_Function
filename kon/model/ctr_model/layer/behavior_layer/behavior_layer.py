@@ -938,5 +938,3 @@ class UICLayer(tf.keras.layers.Layer):
             final_hidden[-1] = tf.reduce_mean(loss) / (inputs.shape[1] - 1)
 
         return final_output+sequence_output+final_hidden
-
-

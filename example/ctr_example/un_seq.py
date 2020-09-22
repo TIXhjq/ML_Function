@@ -51,13 +51,14 @@ targetDf=df[target_fea]
 sparseDf,sparseInfo=prepare_tool.sparse_fea_deal(sparseDf)
 denseDf,denseInfo=prepare_tool.dense_fea_deal(denseDf)
 
-# train_df,test_df,y_train,y_test=prepare_tool.extract_train_test(train_idx=train_idx,test_idx=test_idx,sparseDf=sparseDf,denseDf=denseDf,targetDf=targetDf)
-train_df,test_df,y_train,y_test=prepare_tool.extract_train_test(train_idx=train_idx,test_idx=test_idx,sparseDf=sparseDf,targetDf=targetDf)
+train_df,test_df,y_train,y_test=prepare_tool.extract_train_test(train_idx=train_idx,test_idx=test_idx,sparseDf=sparseDf,denseDf=denseDf,targetDf=targetDf)
+# train_df,test_df,y_train,y_test=prepare_tool.extract_train_test(train_idx=train_idx,test_idx=test_idx,sparseDf=sparseDf,targetDf=targetDf)
 train_x,train_y,val_set=prepare_tool.split_val_set(train_df,y_train,train_index,val_index)
 #----------------------------train model--------------------------------------
 
-model=AutoInt(sparseInfo=sparseInfo)
+model=AutoInt(sparseInfo=sparseInfo,denseInfo=denseInfo)
 print(model.summary())
-model.compile(loss="binary_crossentropy",optimizer='adam',metrics=['accuracy'])
+model.compile(loss="binary_crossentropy",optimizer='adam',metrics=[tf.keras.metrics.AUC()])
 model.fit(train_x,train_y,validation_data=val_set,batch_size=64,epochs=100,callbacks=[tf.keras.callbacks.EarlyStopping(patience=10,verbose=5)],shuffle=False)
 model.predict(test_df)
+

@@ -17,6 +17,7 @@ import os
 from collections import namedtuple
 from kon.model.feature_eng.feature_transform import feature_tool
 from kon.model.feature_eng.base_model import base_model
+import multiprocessing as mp
 
 warnings.filterwarnings("ignore")
 pd.set_option('display.max_columns', None)
@@ -36,12 +37,14 @@ fea_tool = feature_tool(fea_data_folder)
 #-----------------------------------------------------------------
 
 class data_prepare(object):
-    def __init__(self,batch_size=None,use_shuffle=True):
+    def __init__(self,batch_size=None,use_shuffle=True,cpu_core=None):
         print('data prepare is backend')
-        self.sparseFea=namedtuple('sparseFea',['fea_name','word_size','input_dim','cross_unit','linear_unit','pre_weight','mask_zero','is_trainable','input_length','sample_num','batch_size'])
+        self.sparseFea=namedtuple('sparseFea',['fea_name','word_size','input_dim','cross_unit','linear_unit','pre_weight','mask_zero','is_trainable','input_length','sample_num','batch_size','emb_reg'])
         self.denseFea=namedtuple('denseFea',['fea_name','batch_size'])
         self.batch_size=batch_size
         self.use_shuffle=use_shuffle
+        self.cpu_core=mp.cpu_count() if cpu_core==None else cpu_core
+
 
 
     def concat_test_train(self, train_df: DataFrame, test_df: DataFrame):
@@ -51,9 +54,11 @@ class data_prepare(object):
 
         return df, (train_idx, test_idx)
 
-    def sparse_fea_deal(self,sparseDf:DataFrame,embed_dim=8,linear_dim=1,pre_weight=None):
+    def sparse_fea_deal(self,sparseDf:DataFrame,embed_dim=8,linear_dim=1,pre_weight=None,emb_reg=None):
         if not pre_weight:
             pre_weight=[None]*sparseDf.shape[1]
+        if not emb_reg:
+            emb_reg=[1e-8]*sparseDf.shape[1]
 
         sparseDf = sparseDf.fillna('-1')
         for fea in sparseDf:
@@ -63,8 +68,8 @@ class data_prepare(object):
             fea_name=fea, input_dim=sparseDf[fea].shape[0],
             cross_unit=embed_dim, linear_unit=linear_dim,word_size=sparseDf[fea].nunique(),
             pre_weight=weight_,input_length=1,is_trainable=True,mask_zero=False,sample_num=None,
-            batch_size=self.batch_size
-        ) for fea,weight_ in zip(sparseDf,pre_weight)]
+            batch_size=self.batch_size,emb_reg=reg
+        ) for fea,weight_,reg in zip(sparseDf,pre_weight,emb_reg)]
 
         return sparseDf,sparseInfo
 
@@ -140,19 +145,21 @@ class data_prepare(object):
 
         return seqDf,seqIdx,seqInfo
 
-    def sparse_wrap(self,seqDf,embedding_dim:list,seqIdx=None,seqIdx_path=None,max_len:list=None,mask_zero=True,is_trainable=True,pre_weight:list=None,sample_num=None):
+    def sparse_wrap(self,seqDf,embedding_dim:list,seqIdx=None,seqIdx_path=None,max_len:list=None,mask_zero=True,is_trainable=True,pre_weight:list=None,sample_num=None,emb_reg=None):
         if not pre_weight:
             pre_weight=[None]*seqDf.shape[1]
         if not max_len:
             max_len=[None]*seqDf.shape[1]
         if seqIdx_path:
             seqIdx = fea_tool.pickle_op(seqIdx_path, is_save=False)
+        if emb_reg==None:
+            emb_reg=[1e-8]*seqDf.shape[1]
 
         seqInfo = [self.sparseFea(
             fea_name=seq_fea, word_size=len(seqIdx[seq_key].keys()) + 1, input_dim=seqDf[seq_fea].shape[0],
             cross_unit=embed_, linear_unit=1, pre_weight=weight_, mask_zero=mask_zero,
-            is_trainable=is_trainable, input_length=max_, sample_num=sample_num,batch_size=self.batch_size
-        ) for seq_fea, seq_key, weight_, max_, embed_ in zip(seqDf, seqIdx, pre_weight, max_len, embedding_dim)]
+            is_trainable=is_trainable, input_length=max_, sample_num=sample_num,batch_size=self.batch_size,emb_reg=reg
+        ) for seq_fea, seq_key, weight_, max_, embed_,reg in zip(seqDf, seqIdx, pre_weight, max_len, embedding_dim,emb_reg)]
 
         if not isinstance(seqDf,dict):
             seqDf={fea:np.array([[int(j) for j in i.split(',')]for i in seqDf[fea].values]) for fea in seqDf}
@@ -345,5 +352,5 @@ class data_prepare(object):
         train_y = self.input_loc(df=y_train, use_idx=train_index)
         val_x = self.input_loc(df=train_df, use_idx=val_index)
         val_y = self.input_loc(df=y_train, use_idx=val_index)
-
+        
         return train_x,train_y,(val_x,val_y)

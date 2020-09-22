@@ -213,7 +213,8 @@ class SparseEmbed(tf.keras.layers.Layer):
             self.embed=[tf.keras.layers.Embedding(
                 name=info_.fea_name,input_dim=info_.word_size,output_dim=info_.cross_unit,
                 mask_zero=info_.mask_zero,embeddings_initializer=glorot_uniform(seed=self.seed),
-                input_length=info_.input_length,trainable=info_.is_trainable,weights=info_.pre_weight
+                input_length=info_.input_length,trainable=info_.is_trainable,weights=info_.pre_weight,
+                embeddings_regularizer=tf.keras.regularizers.l2(info_.emb_reg)
             ) if info_.cross_unit!=0 else [] for info_ in self.sparse_info]
         else:
             self.embed=[tf.keras.layers.Embedding(

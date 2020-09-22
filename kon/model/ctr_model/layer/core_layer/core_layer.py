@@ -108,11 +108,11 @@ class HiddenLayer(tf.keras.layers.Layer):
             hidden achieve
         In feature, to drop it
     '''
-    def __init__(self,hidden_units:int,use_bn:bool=True,seed=2020,other_dense=None):
+    def __init__(self,hidden_units:int,use_bn:bool=True,seed=2020,l2_reg=0,other_dense=None):
         super(HiddenLayer, self).__init__()
         self.dense=tf.keras.layers.Dense(
             units=hidden_units,kernel_initializer=glorot_uniform(seed=seed),
-            bias_initializer=glorot_uniform(seed=seed)
+            bias_initializer=glorot_uniform(seed=seed),kernel_regularizer=tf.keras.regularizers.l2(l2_reg)
         )
         if other_dense:
             self.dense=other_dense
@@ -157,7 +157,7 @@ class ResActivateLayer(tf.keras.layers.Layer):
 
 
 class DnnLayer(tf.keras.layers.Layer):
-    def __init__(self,hidden_units:list=None,hidden_activate=tf.keras.layers.ReLU(),use_bn:bool=False,res_unit=1,
+    def __init__(self,hidden_units:list=None,l2_reg=0,hidden_activate=tf.keras.layers.ReLU(),use_bn:bool=False,res_unit=1,
                  output_dim=-1,seed=2020,other_dense=None,use_ln:bool=False,use_flatten=False,**kwargs):
         '''
         notice:
