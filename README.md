@@ -3,7 +3,7 @@
 ![image](https://img.shields.io/badge/author-TIXhjq-orange)
 ![image](https://img.shields.io/badge/tensorflow-v2.1-darkgreen)
 ![image](https://img.shields.io/badge/pandas-v0.25.0-darkgreen)
-![image](https://img.shields.io/badge/pypi_package-v0.0.1-lightgrey)
+![image](https://img.shields.io/badge/pypi_package-v0.0.5-lightgrey)
 ![image](https://img.shields.io/badge/License-Apache_2.0-blue)  
 Email:hjq1922451756@gmail.com
 
