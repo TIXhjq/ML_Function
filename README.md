@@ -20,8 +20,8 @@ Email:hjq1922451756@gmail.com
 >>>[Graph(重构)](https://github.com/TIXhjq/CTR_Function/tree/master/kon/model/embedding)     
 >>>[Feature Enginner(重构)](https://github.com/TIXhjq/CTR_Function/tree/master/kon/model/feature_eng)    
 >
->2.[paper](https://github.com/TIXhjq/CTR_Function/tree/master/paper)=[nn(目前只有CTR部分,剩下的下次一定^_^))    
->3.[use example](https://github.com/TIXhjq/CTR_Function/tree/master/example)[ctr_example(充足),else(maybe...))    
+>2.[paper](https://github.com/TIXhjq/CTR_Function/tree/master/paper) [nn(目前只有CTR部分,剩下的下次一定^_^)    
+>3.[use example](https://github.com/TIXhjq/CTR_Function/tree/master/example) [ctr_example(充足),else(maybe...)    
 >4.[data](https://github.com/TIXhjq/CTR_Function/tree/master/data)  
   
   p.s 每层目录有对应的详细介绍...
