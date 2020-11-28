@@ -632,7 +632,10 @@ class feature_tool(object):
     def batch_convert_list(self,a):
         list_ = []
         for i in tqdm(a, desc='convert list'):
-            list_+=self.strList_2_list(i)
+            if i!="[]":
+                list_+=self.strList_2_list(i)
+            else:
+                list_+=[[]]
 
         return list_
 

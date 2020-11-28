@@ -2,6 +2,8 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/backend/DMIN" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/backend/Digix-Huawei-adCTR" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/backend/Huawei-Digix-Algorithm-Contest" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/backend/MIMN" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/backend/mips" vcs="Git" />

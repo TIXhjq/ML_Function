@@ -104,8 +104,8 @@ class ActivationUnitLayer(tf.keras.layers.Layer):
         super(ActivationUnitLayer, self).build(input_shape)
 
     def call(self, inputs, mask=None, **kwargs):
-        if self.need_stack:
-            inputs=[tf.concat(i,axis=-1) for i in inputs]
+        # if self.need_stack:
+            # inputs=[tf.concat(i,axis=-1) for i in inputs]
         behavior_=inputs[1]
         attention_weight=self.attention_weight(inputs,mask=mask)
 
@@ -852,6 +852,22 @@ class UICLayer(tf.keras.layers.Layer):
         concat([NTM,MIU])==UIC
         p.s if not to use_miu==False:
                 UIC=Naive UIC=NTM
+
+
+            ========building========
+
+                    Test CIN core:
+                        naive:
+                            interactive vector to cal final
+                        test version:
+                            not to fully to compare vec,use same bucket to mult
+                        but not naive speaking use language to example there why to useful for metric
+                    pre time:
+                        deadline: 20.11.20(Pre)
+                    [Pre Author]==>(TIXhjq[mio])[hjq19224531756@gmail.com]
+
+            ========building========
+
     '''
     def __init__(self,controller_network=None,controller_input_flat=True,channel_dim=20,
                  memory_slots=128,memory_bits=20,mult_head=3,seed=2020,use_miu=True,
@@ -938,3 +954,98 @@ class UICLayer(tf.keras.layers.Layer):
             final_hidden[-1] = tf.reduce_mean(loss) / (inputs.shape[1] - 1)
 
         return final_output+sequence_output+final_hidden
+
+class LSHLayer(tf.keras.layers.Layer):
+    '''
+        support
+            [ALSH](Asymmetric LSH (ALSH) for Sublinear Time Maximum Inner Product Search (MIPS))
+
+    '''
+    def __init__(self):
+        super(LSHLayer, self).__init__()
+
+    def build(self, input_shape):
+        super(LSHLayer, self).build(input_shape)
+
+    def call(self, inputs, **kwargs):
+        return inputs
+
+    def compute_mask(self, inputs, mask=None):
+        return inputs
+
+
+class ESULayer(tf.keras.layers.Layer):
+    '''
+        SIM:Model with topK[Reduce Behavior]
+            simple seq model
+    '''
+    def __init__(self,attention_dim,attention_head_dim):
+        super(ESULayer, self).__init__()
+        self.multAtten=MultHeadAttentionLayer(attention_dim=attention_dim,attention_head_dim=attention_head_dim,use_res=True)
+
+    def build(self, input_shape):
+        super(ESULayer, self).build(input_shape)
+
+    def call(self, inputs, **kwargs):
+        inputs=tf.concat(inputs,axis=-1)
+        multAtten=tf.squeeze(tf.concat(tf.split(self.multAtten(inputs)[0],[1]*3,axis=0),axis=-1),axis=0)
+
+        return multAtten
+
+
+class GSULayer(tf.keras.layers.Layer):
+    '''
+        SIM:Reduce Long Behavior Complex Core[Extract topK]
+            HardSearch:
+                behavior tag same with target item
+            SoftSearch:
+                describe to SoftSearchLayer
+        :return topK similar target item to reduce behavior model complex
+    '''
+    def __init__(self):
+        super(GSULayer, self).__init__()
+
+    def build(self, input_shape):
+        super(GSULayer, self).build(input_shape)
+
+    def call(self,inputs,**kwargs):
+        return inputs
+
+class SoftSearchLayer(tf.keras.layers.Layer):
+    '''
+        SIM:SoftSearch
+            use inner behavior with target item to similar
+                ==>topK similar item
+    '''
+    def __init__(self,attention_hidden_units,classify_hidden_units,l2_reg):
+        super(SoftSearchLayer, self).__init__()
+        self.attention=ActivationUnitLayer(hidden_units=attention_hidden_units)
+        self.dnn=DnnLayer(hidden_units=classify_hidden_units, hidden_activate=tf.keras.layers.PReLU(), res_unit=2,
+                              use_bn=True)
+
+    def build(self, input_shape):
+        super(SoftSearchLayer, self).build(input_shape)
+
+    def call(self,inputs,mask=None,**kwargs):
+        weightBehavior=self.attention(inputs,mask=mask)
+        poolingBehavior=tf.reduce_sum(weightBehavior,axis=1)
+        mlp_output = self.dnn(poolingBehavior)
+        output = MergeScoreLayer(use_merge=False)(mlp_output)
+
+        return output
+
+    def compute_mask(self, inputs, mask=None):
+        return mask
+
+
+
+
+
+
+
+
+
+
+
+
+

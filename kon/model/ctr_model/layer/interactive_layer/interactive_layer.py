@@ -227,7 +227,6 @@ class SparseEmbed(tf.keras.layers.Layer):
         embed_list = [emb_(input_) if info_.cross_unit != 0 else input_ for emb_, input_, info_ in
                       zip(self.embed ,inputs, self.sparse_info)]
 
-
         if self.flatten:
             embed_list=[flat_(embed_) for flat_,embed_ in zip(self.flatten,embed_list)]
 
@@ -237,7 +236,8 @@ class SparseEmbed(tf.keras.layers.Layer):
         self.embed_list=embed_list
 
         if self.mask_zero:
-            return embed_list,[emb._keras_mask if info_.cross_unit!=0 else [] for emb,info_ in zip(embed_list,self.sparse_info)]
+            return embed_list,\
+                   [emb._keras_mask if info_.cross_unit!=0 else [] for emb,info_ in zip(embed_list,self.sparse_info)]
         else:
             return embed_list
 

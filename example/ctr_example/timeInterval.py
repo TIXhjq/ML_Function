@@ -45,14 +45,13 @@ sparseDf,sparseInfo=data_pre.sparse_fea_deal(sparseDf)
 train_df,test_df,y_train,y_test=data_pre.extract_train_test(
     targetDf=targetDf,test_idx=test_idx,train_idx=train_idx,sparseDf=sparseDf,seqDf=seqDf)
 
-fea_tool.count_col()
 
 userFea=['region']
 timestampFea=['click_interval']
 behaviorFea=['click_item']
 targetFea=['vid']
 
-model=DTS(sparseInfo=sparseInfo,seqInfo=seqInfo,userFea=userFea,
+model=DTS(data_pre.FeatureInput(sparseInfo=sparseInfo,seqInfo=seqInfo),userFea=userFea,
            timestampFea=timestampFea,behaviorFea=behaviorFea,targetFea=targetFea)
 print(model.summary())
 model.compile(loss="mean_squared_error",optimizer='adam',metrics=['accuracy'])

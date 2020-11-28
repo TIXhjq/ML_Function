@@ -15,6 +15,8 @@ import numpy as np
 import warnings
 import os
 from collections import namedtuple
+
+from kon.model.ctr_model.layer.interactive_layer.interactive_layer import SparseEmbed
 from kon.model.feature_eng.feature_transform import feature_tool
 from kon.model.feature_eng.base_model import base_model
 import multiprocessing as mp
@@ -35,6 +37,22 @@ fea_data_folder = data_folder + 'fea_data/'
 model_tool = base_model(submit_data_folder)
 fea_tool = feature_tool(fea_data_folder)
 #-----------------------------------------------------------------
+class InputFeature(object):
+    def __init__(self,denseInfo:list=None,sparseInfo:list=None,seqInfo:list=None,denseInputs:list=None,sparseInputs:list=None,seqInputs:list=None,linearEmbed:list=None,sparseEmbed:list=None,seqEmbedList:list=None):
+        self.dense_info=denseInfo
+        self.sparse_info=sparseInfo
+        self.seq_info=seqInfo
+        self.dense_inputs=denseInputs
+        self.sparse_inputs=sparseInputs
+        self.seq_inputs=seqInputs
+        self.linear_embed=linearEmbed
+        self.sparse_embed=sparseEmbed
+        self.seq_embed_list=seqEmbedList
+
+    def toList(self):
+        from pprint import pprint
+        pprint([self.dense_info,self.sparse_info,self.seq_info,self.dense_inputs,self.sparse_inputs,
+                self.seq_inputs,self.linear_embed,self.sparse_embed,self.seq_embed_list])
 
 class data_prepare(object):
     def __init__(self,batch_size=None,use_shuffle=True,cpu_core=None):
@@ -45,7 +63,18 @@ class data_prepare(object):
         self.use_shuffle=use_shuffle
         self.cpu_core=mp.cpu_count() if cpu_core==None else cpu_core
 
+    def FeatureInput(self,sparseInfo:list=None, denseInfo:list=None, seqInfo=None,useLinear:bool=False,useAddLinear:bool=False,useFlattenLinear:bool=False,useFlattenSparse:bool=False):
 
+        linearEmbed,sparseEmbed,seqEmbed, seqMask=None,None,None,None
+        [denseInputs, sparseInputs, seqInputs] =self.df_prepare(sparseInfo=sparseInfo, denseInfo=denseInfo,seqInfo=seqInfo)
+        if useLinear:
+            linearEmbed = SparseEmbed(sparseInfo, use_flatten=useFlattenLinear, is_linear=True,use_add=useAddLinear)(sparseInputs)
+        if sparseInputs:
+            sparseEmbed = SparseEmbed(sparseInfo, use_flatten=useFlattenSparse)(sparseInputs)
+        if seqInputs:
+            seqEmbed,seqMask= SparseEmbed(seqInfo,support_masking=True,mask_zero=True,is_linear=False,use_flatten=False)(seqInputs)
+
+        return InputFeature(denseInfo,sparseInfo,seqInfo,denseInputs,sparseInputs,seqInputs,linearEmbed,sparseEmbed,[seqEmbed,seqMask])
 
     def concat_test_train(self, train_df: DataFrame, test_df: DataFrame):
         train_idx = train_df.index.tolist()
@@ -83,6 +112,7 @@ class data_prepare(object):
                 format: ['1,2','3']
         '''
         sample_seq={}
+
         if is_str_list:
             seq_list = fea_tool.batch_convert_list(seq_list)
         if is_str:
@@ -103,12 +133,27 @@ class data_prepare(object):
 
         return (format_seq, seq_idx,sample_seq)
 
-    def seq_deal(self,seqDf,embedding_dim:list,max_len:list=None,is_str_list=True,is_str=False,mask_zero=True,is_trainable=True,pre_weight:list=None,sample_num=None,use_wrap=True):
+
+    def hard_search(self,seqData:list,seqCate:list,targetCate:list)->(list,list):
+        '''
+            SIM HardSearch[same cate to similar]
+            :return format(reduce seq,reduce seq cate)
+        '''
+        aimIdx=[[idx_ for idx_,cate_ in enumerate(cateList) if cate_==aimCate]
+                for cateList, aimCate in zip(seqCate, targetCate)]
+        aimList=np.array([[np.array(seq)[idx_],np.array(cate)[idx_]]
+                        if idx_!=[] else [[],[]] for seq,cate,idx_ in zip(seqData,seqCate,aimIdx)])
+        seqData,seqCate=np.split(aimList,[1],axis=1)
+
+        return seqData,seqCate
+
+
+    def seq_deal(self,seqDf,embedding_dim:list,max_len:list=None,is_str_list=True,is_str=False,mask_zero=True,is_trainable=True,pre_weight:list=None,sample_num=None,use_wrap=True,emb_reg=None):
         '''
         notice:
                 <1> seqDf:
                     format===>single_seq_deal
-                <2> pre_weight:
+                <2> preEmbeddingWeight:
                     format===>[[fea1_weight],[fea2_weight]...]
                 <3> sample_num:
                     notice:
@@ -125,27 +170,33 @@ class data_prepare(object):
         :param use_wrap: use sparseFea wrap==True
         :return:seqDf,seqIdx,seqInfo
         '''
+
         if not pre_weight:
             pre_weight=[None]*seqDf.shape[1]
         if not max_len:
             max_len=[None]*seqDf.shape[1]
-        sample_seq=None
+        if not emb_reg:
+            emb_reg=[1e-8]*seqDf.shape[1]
+
         seq_tuple={
             seq_fea:self.single_seq_deal(seqDf[seq_fea],is_str_list=is_str_list,is_str=is_str,max_len=len_,sample_num=sample_num)
                    for seq_fea,len_ in zip(seqDf,max_len)}
         seqDf={key:seq_tuple[key][0] for key in seq_tuple}
         seqIdx = {key: seq_tuple[key][1] for key in seq_tuple}
+
+        sample_seq = None
         if sample_num:
             sample_seq={key:[i[1:] for i in seq_tuple[key][2]] for key in seq_tuple}
         del seq_tuple
 
         seqInfo=None
         if use_wrap:
-            seqDf,seqInfo=self.sparse_wrap(seqDf,seqIdx=seqIdx,embedding_dim=embedding_dim,max_len=max_len,mask_zero=mask_zero,is_trainable=is_trainable,pre_weight=pre_weight,sample_num=sample_num)
+            seqDf,seqInfo=self.sparse_wrap(seqDf,seqIdx=seqIdx,embedding_dim=embedding_dim,max_len=max_len,mask_zero=mask_zero,is_trainable=is_trainable,pre_weight=pre_weight,sample_num=sample_num,emb_reg=emb_reg)
 
         return seqDf,seqIdx,seqInfo
 
     def sparse_wrap(self,seqDf,embedding_dim:list,seqIdx=None,seqIdx_path=None,max_len:list=None,mask_zero=True,is_trainable=True,pre_weight:list=None,sample_num=None,emb_reg=None):
+
         if not pre_weight:
             pre_weight=[None]*seqDf.shape[1]
         if not max_len:
@@ -302,12 +353,13 @@ class data_prepare(object):
         except TypeError:
             train_seq,test_seq= {}, {}
 
-        y_train=targetDf.loc[train_idx]
-        y_test=targetDf.loc[test_idx]
         if use_softmax:
-            y_train=tf.keras.utils.to_categorical(y_train.values.tolist())
+            targetDf=tf.keras.utils.to_categorical(targetDf.values.tolist())
         else:
-            y_train=y_train.values
+            targetDf=targetDf.values
+
+        y_train=targetDf[train_idx]
+        y_test=targetDf[test_idx]
 
         train_df=self.df_format_input([train_dense,train_sparse])
         test_df=self.df_format_input([test_dense,test_sparse])
@@ -343,6 +395,7 @@ class data_prepare(object):
         need_idx = np.random.choice(list(range(df_num)), size=batch_num)
         if self.use_shuffle:
             shuffle(need_idx)
+
         df = self.input_loc(df, use_idx=need_idx)
 
         return df
