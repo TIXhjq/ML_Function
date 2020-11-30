@@ -14,11 +14,11 @@ Email:hjq1922451756@gmail.com
 >1.[code folder](https://github.com/TIXhjq/CTR_Function/tree/master/code)=[nn,feature_eng])
 > 
 >>1)新鲜,可食用    
->>>[CTR](https://github.com/TIXhjq/CTR_Function/tree/master/kon/model/ctr_model)    
+>>>[[building...] CTR](https://github.com/TIXhjq/CTR_Function/tree/master/kon/model/ctr_model)    
 >
 >>2)需要重构部分(历史代码)  
 >>>[Graph(重构)](https://github.com/TIXhjq/CTR_Function/tree/master/kon/model/embedding)     
->>>[Feature Enginner(重构)](https://github.com/TIXhjq/CTR_Function/tree/master/kon/model/feature_eng)    
+>>>[[building...] Feature Enginner(在scala上进行重构)](https://github.com/TIXhjq/CTR_Function/tree/master/kon/model/feature_eng)    
 >
 >2.[paper](https://github.com/TIXhjq/CTR_Function/tree/master/paper) [nn(目前只有CTR部分,剩下的下次一定^_^)    
 >3.[use example](https://github.com/TIXhjq/CTR_Function/tree/master/example) [ctr_example(充足),else(maybe...)    
