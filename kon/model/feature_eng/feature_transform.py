@@ -4,7 +4,7 @@
 @Date   :19-11-15 上午11:59
 ================================='''
 import logging
-from pandarallel import pandarallel
+# from pandarallel import pandarallel
 import gensim
 import matplotlib.pyplot as plt
 from scipy.stats import stats
@@ -45,7 +45,7 @@ origin_data_folder=data_folder+'origin_data/'
 submit_data_folder=data_folder+'submit/'
 eda_data_folder=data_folder+'eda_data/'
 result_fea_folder=submit_data_folder+'use_feature/'
-pandarallel.initialize()
+# pandarallel.initialize()
 #----------------------------------------------------
 class feature_tool(object):
     def __init__(self,save_folder:str):

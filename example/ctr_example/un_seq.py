@@ -58,7 +58,7 @@ train_x,train_y,val_set=prepare_tool.split_val_set(train_df,y_train,train_index,
 
 model=FM(prepare_tool.FeatureInput(sparseInfo=sparseInfo,denseInfo=denseInfo,useAddLinear=False,useLinear=True,useFlattenLinear=False))
 print(model.summary())
-model.compile(loss="mean_squared_error",optimizer='adam',metrics=[tf.keras.metrics.AUC()])
+model.compile(loss=tf.losses.binary_crossentropy,optimizer='adam',metrics=[tf.keras.metrics.AUC()])
 model.fit(train_x,train_y,validation_data=val_set,batch_size=64,epochs=100,callbacks=[tf.keras.callbacks.EarlyStopping(patience=10,verbose=5)],shuffle=False)
 model.predict(test_df)
 

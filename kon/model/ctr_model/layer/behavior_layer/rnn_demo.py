@@ -18,9 +18,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from tensorflow_core.python import zeros_like, control_flow_util, expand_dims, nest
-from tensorflow_core.python.keras.backend import reverse
-from tensorflow_core.python.ops import tensor_array_ops
+import tensorflow as tf
+from tensorflow.keras.backend import zeros_like, expand_dims
+from tensorflow.keras.backend import reverse
+from tensorflow.python.ops import tensor_array_ops,control_flow_util
 import uuid
 from tensorflow.python.eager import context
 from tensorflow.python.eager import function
@@ -1698,7 +1699,7 @@ def rnn_backend(step_function,
     return array_ops.transpose(input_t, axes)
 
   if not time_major:
-    inputs = nest.map_structure(swap_batch_timestep, inputs)
+    inputs = tf.nest.map_structure(swap_batch_timestep, inputs)
 
   flatted_inputs = nest.flatten(inputs)
   time_steps = flatted_inputs[0].shape[0]

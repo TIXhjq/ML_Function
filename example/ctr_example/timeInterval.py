@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # _*_ coding:utf-8 _*_
 '''=================================
 @Author :tix_hjq
@@ -54,7 +53,7 @@ targetFea=['vid']
 model=DTS(data_pre.FeatureInput(sparseInfo=sparseInfo,seqInfo=seqInfo),userFea=userFea,
            timestampFea=timestampFea,behaviorFea=behaviorFea,targetFea=targetFea)
 print(model.summary())
-model.compile(loss="mean_squared_error",optimizer='adam',metrics=['accuracy'])
+model.compile(loss=tf.losses.binary_crossentropy,optimizer='adam',metrics=[tf.keras.metrics.AUC()])
 
 from tensorflow.keras.callbacks import EarlyStopping
 model.fit(train_df,y_train,validation_data=(test_df,y_test),epochs=100,

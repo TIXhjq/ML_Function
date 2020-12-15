@@ -57,5 +57,5 @@ behaviorFea=['click_item_session']
 
 model=DSIN(data_pre.FeatureInput(sparseInfo=sparseInfo,seqInfo=seqInfo),candidateFea=candidateFea,behaviorFea=behaviorFea)
 print(model.summary())
-model.compile(loss="mean_squared_error",optimizer='adam',metrics=['accuracy'])
+model.compile(loss=tf.losses.binary_crossentropy,optimizer='adam',metrics=[tf.keras.metrics.AUC()])
 model.fit(train_df,y_train,validation_data=(test_df,y_test),epochs=100,callbacks=[tf.keras.callbacks.EarlyStopping(patience=10,verbose=5)])

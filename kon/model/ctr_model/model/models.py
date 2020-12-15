@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # _*_ coding:utf-8 _*_
 '''=================================
 @Author :tix_hjq
@@ -28,8 +27,6 @@ fea_data_folder=data_folder+'fea_data/'
 # fea_tool=feature_tool(fea_data_folder)
 prepare_tool=data_prepare()
 #-----------------------------------------------------------------
-# class FeatureInput(object):
-
 def TestModel(inputFea:InputFeature=None):
     input_=StackLayer()(inputFea.sparse_embed)
     dnn_output=DnnLayer(hidden_units=[100,10])(input_)

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # _*_ coding:utf-8 _*_
 '''=================================
 @Author :tix_hjq
@@ -333,6 +332,9 @@ class data_prepare(object):
 
         return inputs
 
+    def data_pipeline(self,dataSet:tuple):
+        dataSet=tf.data.Dataset.from_tensor_slices(dataSet)
+        return dataSet.shuffle(2048).repeat(2).batch(batch_size=self.batch_size).prefetch(2)
 
     def extract_train_test(self,train_idx, test_idx,targetDf,sparseDf=None, denseDf=None,seqDf=None,use_softmax=True):
         try:
@@ -372,7 +374,10 @@ class data_prepare(object):
             y_train=self.static_batch(y_train)
             y_test=self.static_batch(y_test)
 
-        return train_df,test_df,y_train,y_test
+        train=self.data_pipeline((train_df,y_train))
+        test=self.data_pipeline((test_df,y_test))
+
+        return train,test
 
     def input_loc(self,df,use_idx:list):
         '''

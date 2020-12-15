@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # _*_ coding:utf-8 _*_
 '''=================================
 @Author :tix_hjq
@@ -54,10 +53,10 @@ seqDf,seqIdx,seqInfo=data_pre.seq_deal(
 
 sparseDf,sparseInfo=data_pre.sparse_fea_deal(sparseDf)
 
-train_df,test_df,y_train,y_test=data_pre.extract_train_test(
+train,val=data_pre.extract_train_test(
     targetDf=targetDf,test_idx=test_idx,train_idx=train_idx,sparseDf=sparseDf,seqDf=seqDf)
 
 model=SIM(data_pre.FeatureInput(sparseInfo=sparseInfo,seqInfo=seqInfo),reduceFea=reduce_fea,candidateFea=["item_id","item_cate"],behaviorFea=seq_fea)
 print(model.summary())
-model.compile(loss="mean_squared_error",optimizer='adam',metrics=['accuracy'])
-model.fit(train_df,y_train,validation_data=(test_df,y_test),epochs=100,callbacks=[tf.keras.callbacks.EarlyStopping(patience=10,verbose=5)])
+model.compile(loss=tf.losses.binary_crossentropy,optimizer='adam',metrics=[tf.keras.metrics.AUC()])
+model.fit(train,validation_data=val,epochs=100,callbacks=[tf.keras.callbacks.EarlyStopping(patience=10,verbose=5)])

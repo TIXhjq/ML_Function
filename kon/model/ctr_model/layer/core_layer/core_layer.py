@@ -6,7 +6,7 @@
 @File   :core_layer.py
 ================================='''
 import tensorflow as tf
-from tensorflow_core.python.keras.initializers import glorot_uniform
+from tensorflow.keras.initializers import glorot_uniform
 import pandas as pd
 import warnings
 import os

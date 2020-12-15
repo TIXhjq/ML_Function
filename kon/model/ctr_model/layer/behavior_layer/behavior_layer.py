@@ -6,12 +6,10 @@
 @File   :behavior_layer.py
 ================================='''
 from numpy.random import random
-import tensorflow as tf
-import pandas as pd
+from tensorflow.keras.initializers import glorot_uniform
 import numpy as np
 import warnings
 import os
-
 from kon.model.ctr_model.layer.behavior_layer.rnn_demo import AUGRU
 from kon.model.ctr_model.layer.core_layer.core_layer import *
 
