@@ -41,7 +41,7 @@ seqDf,seqIdx,seqInfo=data_pre.seq_deal(
     is_str=True,sample_num=5)
 sparseDf,sparseInfo=data_pre.sparse_fea_deal(sparseDf)
 
-train_df,test_df,y_train,y_test=data_pre.extract_train_test(
+train,val=data_pre.extract_train_test(
     targetDf=targetDf,test_idx=test_idx,train_idx=train_idx,sparseDf=sparseDf,seqDf=seqDf)
 
 
@@ -54,7 +54,4 @@ model=DTS(data_pre.FeatureInput(sparseInfo=sparseInfo,seqInfo=seqInfo),userFea=u
            timestampFea=timestampFea,behaviorFea=behaviorFea,targetFea=targetFea)
 print(model.summary())
 model.compile(loss=tf.losses.binary_crossentropy,optimizer='adam',metrics=[tf.keras.metrics.AUC()])
-
-from tensorflow.keras.callbacks import EarlyStopping
-model.fit(train_df,y_train,validation_data=(test_df,y_test),epochs=100,
-          callbacks=[EarlyStopping(patience=10,verbose=5)])
+model.fit(train,validation_data=val,epochs=100,callbacks=[tf.keras.callbacks.EarlyStopping(patience=10,verbose=5)])

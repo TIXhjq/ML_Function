@@ -49,7 +49,7 @@ seqDf,seqInfo=data_pre.sparse_wrap(seqDf,seqIdx_path=origin_data_folder+'session
 sparseDf,sparseInfo=data_pre.sparse_fea_deal(sparseDf)
 denseDf,denseInfo=data_pre.dense_fea_deal(denseDf)
 
-train_df,test_df,y_train,y_test=data_pre.extract_train_test(
+train,val=data_pre.extract_train_test(
     targetDf=targetDf,test_idx=test_idx,train_idx=train_idx,sparseDf=sparseDf,seqDf=seqDf,denseDf=denseDf)
 
 candidateFea=['vid']
@@ -58,4 +58,4 @@ behaviorFea=['click_item_session']
 model=DSIN(data_pre.FeatureInput(sparseInfo=sparseInfo,seqInfo=seqInfo),candidateFea=candidateFea,behaviorFea=behaviorFea)
 print(model.summary())
 model.compile(loss=tf.losses.binary_crossentropy,optimizer='adam',metrics=[tf.keras.metrics.AUC()])
-model.fit(train_df,y_train,validation_data=(test_df,y_test),epochs=100,callbacks=[tf.keras.callbacks.EarlyStopping(patience=10,verbose=5)])
+model.fit(train,validation_data=val,epochs=100,callbacks=[tf.keras.callbacks.EarlyStopping(patience=10,verbose=5)])
