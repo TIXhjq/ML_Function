@@ -850,22 +850,6 @@ class UICLayer(tf.keras.layers.Layer):
         concat([NTM,MIU])==UIC
         p.s if not to use_miu==False:
                 UIC=Naive UIC=NTM
-
-
-            ========building========
-
-                    Test CIN core:
-                        naive:
-                            interactive vector to cal final
-                        test version:
-                            not to fully to compare vec,use same bucket to mult
-                        but not naive speaking use language to example there why to useful for metric
-                    pre time:
-                        deadline: 20.11.20(Pre)
-                    [Pre Author]==>(TIXhjq[mio])[hjq19224531756@gmail.com]
-
-            ========building========
-
     '''
     def __init__(self,controller_network=None,controller_input_flat=True,channel_dim=20,
                  memory_slots=128,memory_bits=20,mult_head=3,seed=2020,use_miu=True,
