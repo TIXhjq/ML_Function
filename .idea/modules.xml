@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/CTR_Function.iml" filepath="$PROJECT_DIR$/.idea/CTR_Function.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../industry_version/industry_version.iml" filepath="$PROJECT_DIR$/../industry_version/industry_version.iml" />
     </modules>
   </component>
 </project>
